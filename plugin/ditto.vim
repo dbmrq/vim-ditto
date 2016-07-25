@@ -57,12 +57,12 @@ endfunction
 let s:matchcount = 0
 
 function! Ditto() range
-    if len(s:matchedids) > 0
-        for id in s:matchedids
-            call matchdelete(id)
-        endfor
-        let s:matchedids = []
-    endif
+    " if len(s:matchedids) > 0
+    "     for id in s:matchedids
+    "         call matchdelete(id)
+    "     endfor
+    "     let s:matchedids = []
+    " endif
     if a:firstline - a:lastline == 0
         let firstline = 1
         let lastline = line('$')
@@ -71,24 +71,14 @@ function! Ditto() range
         let lastline = a:lastline
     endif
     let words = GetWords(firstline, lastline)
-    if len(words) <= 0
+    if len(words) <= 0 || s:matchcount > len(words) - 1
         echo "Ditto: Not enough words"
         return
     endif
     let word = words[s:matchcount][0]
     let s:matchcount += 1
-    echo word
-    let line = firstline
-    while line <= lastline
-        let column = matchstrpos(getline(line), word)[1]
-        while column < matchstrpos(getline(line), '$')[1] && column >= 0
-            call add(s:matchedids, matchaddpos(
-                \ g:ditto_hlgroup, [[line, column + 1, len(word)]]))
-            let column =
-                \ matchstrpos(getline(line), word, column + len(word))[1]
-        endwhile
-        let line += 1
-    endwhile
+    call add(s:matchedids, matchadd(g:ditto_hlgroup,
+        \ word . '\%>' . firstline . 'l\%<' . lastline . 'l'))
 endfunction
 
 function! UnDitto()
@@ -128,6 +118,10 @@ function! SaveWord(word, file)
     execute 'w >>' . a:file
     q
 endfun
+
+" function! DittoPar()
+"     execute ":g/\n\n\s*\zs.\_.\{-}\ze\n\n/execute 'normal! vip:Ditto\<cr>'<cr>"
+" endfunction
 
 
 command! -range=% Ditto <line1>,<line2>call Ditto()
