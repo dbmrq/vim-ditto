@@ -11,10 +11,6 @@ let g:loaded_ditto = 1
 
 " Options {{{
 
-if !exists('g:ditto_mode')
-    let g:ditto_mode = 'paragraph'
-endif
-
 if !exists('g:ditto_min_word_length')
     let g:ditto_min_word_length = 4
 endif
@@ -26,6 +22,14 @@ endif
 if !exists('g:ditto_hlgroups')
     let g:ditto_hlgroups = ['Error',]
                         " \ 'Title',]
+endif
+
+if !exists('g:ditto_mode')
+    let g:ditto_mode = 'paragraph'
+endif
+
+if !exists('g:ditto_autocmd')
+    let g:ditto_autocmd = 'InsertCharPre'
 endif
 
 if !exists('g:dittofile')
@@ -196,19 +200,19 @@ function! s:ditto(...) range
     call winrestview(l:winview)
 endfunction
 
-function! s:clearMatches()
-    for id in s:matchedids
-        silent! call matchdelete(id)
-    endfor
-    let s:matchedids = []
-endfunction
-
 function! s:noDitto()
     call s:clearMatches()
     let s:matchcount = 0
     let s:dittoSentOn = 0
     let s:dittoParOn = 0
     let s:dittoFileOn = 0
+endfunction
+
+function! s:clearMatches()
+    for id in s:matchedids
+        silent! call matchdelete(id)
+    endfor
+    let s:matchedids = []
 endfunction
 
     " Show next and previous matches {{{2
@@ -247,25 +251,25 @@ endfunction
 
     function! s:dittoSent()
         let l:winview = winsaveview()
-        execute "normal! m]"
-        g/\(\.\|!\|?\)\()\|]\|"\|'\)*\($\|\s\)/execute "normal! v(:call s:ditto()\<cr>"
-        execute "normal! `]"
+        silent execute "normal! m]"
+        silent g/\(\.\|!\|?\)\()\|]\|"\|'\)*\($\|\s\)/execute "normal! v(:call s:ditto()\<cr>"
+        silent execute "normal! `]"
         call winrestview(l:winview)
     endfunction
 
     function! s:dittoPar()
         let l:winview = winsaveview()
-        execute "normal! m]"
-        g/\v.(\n\n|\n*%$)/execute "normal! v{:call s:ditto()\<cr>"
-        execute "normal! `]"
+        silent execute "normal! m]"
+        silent g/\v.(\n\n|\n*%$)/execute "normal! v{:call s:ditto()\<cr>"
+        silent execute "normal! `]"
         call winrestview(l:winview)
     endfunction
 
     function! s:dittoFile()
         let l:winview = winsaveview()
-        execute "normal! m]"
-        execute line(0) . ',' . line('$') 'call s:ditto()'
-        execute "normal! `]"
+        silent execute "normal! m]"
+        silent execute line(0) . ',' . line('$') 'call s:ditto()'
+        silent execute "normal! `]"
         call winrestview(l:winview)
     endfunction
 
@@ -282,82 +286,72 @@ let s:dittoFileOn = 0
 
 let s:lastline = 0
 
-function! s:autoDittoSent()
-    if s:dittoSentOn == 1 &&
-        \ (line('$') != s:lastline || getline('.')[col('.')-2] == " ")
-            call s:clearMatches()
-            call s:dittoSent()
-            let s:lastline = line('$')
+function! s:dittoUpdate()
+    if s:dittoSentOn == 1
+        call s:clearMatches()
+        call s:dittoSent()
+    elseif s:dittoParOn == 1
+        call s:clearMatches()
+        call s:dittoPar()
+    elseif s:dittoFileOn == 1
+        call s:clearMatches()
+        call s:dittoFile()
     endif
 endfunction
 
-function! s:autoDittoPar()
-    if s:dittoParOn == 1 &&
-        \ (line('$') != s:lastline || getline('.')[col('.')-2] == " ")
-            call s:clearMatches()
-            call s:dittoPar()
-            let s:lastline = line('$')
+function! s:dittoTextChanged()
+    if line('$') != s:lastline
+        call s:dittoUpdate()
+        let s:lastline = line('$')
     endif
 endfunction
 
-function! s:autoDittoFile()
-    if s:dittoFileOn == 1 &&
-        \ (line('$') != s:lastline || getline('.')[col('.')-2] == " ")
-            call s:clearMatches()
-            call s:dittoFile()
-            let s:lastline = line('$')
+function! s:dittoInsertCharPre(char)
+    if a:char == " "
+        call s:dittoUpdate()
     endif
 endfunction
+
+function! s:dittoCursorHold()
+    if line('$') != s:lastline
+        call s:dittoUpdate()
+        let s:lastline = line('$')
+    endif
+endfunction
+
 
     " Turn autocmds on and off {{{2
 
-    function! s:dittoSentOn()
-        let s:dittoSentOn = 1
-        call s:clearMatches()
-        call s:dittoSent()
-        au TextChanged,TextChangedI * call s:autoDittoSent()
+    function! s:addAutoCmds()
+        au TextChanged * call s:dittoTextChanged()
+        if tolower(g:ditto_autocmd) =~ "cursorhold"
+            au CursorHold * call s:dittoCursorHold()
+            au CursorHoldI * call s:dittoUpdate()
+        elseif tolower(g:ditto_autocmd) =~ "insertleave"
+            au InsertLeave * call s:dittoUpdate()
+        else
+            au InsertCharPre * call s:dittoInsertCharPre(v:char)
+        endif
         au WinLeave * call s:clearMatches()
         au WinEnter * call s:dittoUpdate()
     endfunction
 
-    function! s:dittoParOn()
-        let s:dittoParOn = 1
-        call s:clearMatches()
-        call s:dittoPar()
-        au TextChanged,TextChangedI * call s:autoDittoPar()
-        au WinLeave * call s:clearMatches()
-        au WinEnter * call s:dittoUpdate()
-    endfunction
-
-    function! s:dittoFileOn()
-        let s:dittoFileOn = 1
-        call s:clearMatches()
-        call s:dittoFile()
-        au TextChanged,TextChangedI * call s:autoDittoFile()
-        au WinLeave * call s:clearMatches()
-        au WinEnter * call s:dittoUpdate()
-    endfunction
 
     function! s:dittoOn()
-        if s:dittoSentOn == 1
-            call s:dittoSentOn()
+        if s:dittoParOn == 1 || s:dittoSentOn == 1 || s:dittoFileOn == 1
+            call s:dittoUpdate()
             return
-        elseif s:dittoParOn == 1
-            call s:dittoParOn()
-            return
-        elseif s:dittoFileOn == 1
-            call s:dittoSentOn()
-            return
-        else
-            call s:noDitto()
         endif
+        call s:noDitto()
         if tolower(g:ditto_mode) =~ 'file'
-            call s:dittoFileOn()
+            let s:dittoFileOn = 1
         elseif tolower(g:ditto_mode) =~ 'sent'
-            call s:dittoSentOn()
+            let s:dittoSentOn = 1
         else
-            call s:dittoParOn()
+            let s:dittoParOn = 1
         endif
+        call s:addAutoCmds()
+        call s:dittoUpdate()
     endfunction
 
     function! s:dittoOff()
@@ -372,20 +366,6 @@ endfunction
         endif
     endfunction
 
-    function! s:dittoUpdate()
-        if s:dittoParOn == 1 || s:dittoSentOn == 1 || s:dittoFileOn == 1
-            if s:dittoSentOn == 1
-                call s:dittoSent()
-            elseif s:dittoParOn == 1
-                call s:dittoPar()
-            elseif s:dittoFileOn == 1
-                call s:dittoSent()
-            else
-                call s:noDitto()
-            endif
-        endif
-    endfunction
-
     "}}}2
 
 "}}}1
@@ -396,9 +376,9 @@ endfunction
 command! -range=% Ditto <line1>,<line2>call <SID>ditto(1)
 command! NoDitto call <SID>noDitto()
 
-command! DittoSent call <SID>dittoSentOn()
-command! DittoPar call <SID>dittoParOn()
-command! DittoFile call <SID>dittoFileOn()
+command! DittoSent call <SID>dittoSent()
+command! DittoPar call <SID>dittoPar()
+command! DittoFile call <SID>dittoFile()
 
 command! DittoOn call <SID>dittoOn()
 command! DittoOff call <SID>dittoOff()
