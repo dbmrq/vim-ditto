@@ -31,15 +31,20 @@ endif
 if !exists('g:dittofile')
     for dir in split(&l:runtimepath, ",")
         if isdirectory(expand(dir))
-            let g:dittofile = expand(dir) . '/dittofile.txt'
+            if !isdirectory(expand(dir) . '/Ditto')
+                call mkdir(expand(dir) . '/Ditto')
+            endif
+            let g:dittofile = expand(dir) . '/Ditto/dittofile.txt'
             break
         endif
     endfor
 else
-    for dir in split(g:dittofile, ",")
+    for file in split(g:dittofile, ",")
         if isdirectory(expand(dir))
             let g:dittofile = expand(dir) . '/dittofile.txt'
             break
+        else
+            let g:dittofile = expand(dir)
         endif
     endfor
 endif
