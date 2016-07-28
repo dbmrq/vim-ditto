@@ -315,27 +315,27 @@ endfunction
         let s:dittoSentOn = 1
         call s:clearMatches()
         call s:dittoSent()
-        au TextChanged,TextChangedI,WinEnter * call s:autoDittoSent()
-        au BufLeave,WinLeave,TabLeave * call s:clearMatches()
-        au BufEnter,WinEnter,TabEnter * call s:dittoUpdate()
+        au TextChanged,TextChangedI * call s:autoDittoSent()
+        au WinLeave * call s:clearMatches()
+        au WinEnter * call s:dittoUpdate()
     endfunction
 
     function! s:dittoParOn()
         let s:dittoParOn = 1
         call s:clearMatches()
         call s:dittoPar()
-        au TextChanged,TextChangedI,WinEnter * call s:autoDittoPar()
-        au BufLeave,WinLeave,TabLeave * call s:clearMatches()
-        au BufEnter,WinEnter,TabEnter * call s:dittoUpdate()
+        au TextChanged,TextChangedI * call s:autoDittoPar()
+        au WinLeave * call s:clearMatches()
+        au WinEnter * call s:dittoUpdate()
     endfunction
 
     function! s:dittoFileOn()
         let s:dittoFileOn = 1
         call s:clearMatches()
         call s:dittoFile()
-        au TextChanged,TextChangedI,WinEnter * call s:autoDittoFile()
-        au BufLeave,WinLeave,TabLeave * call s:clearMatches()
-        au BufEnter,WinEnter,TabEnter * call s:dittoUpdate()
+        au TextChanged,TextChangedI * call s:autoDittoFile()
+        au WinLeave * call s:clearMatches()
+        au WinEnter * call s:dittoUpdate()
     endfunction
 
     function! s:dittoOn()
@@ -375,11 +375,11 @@ endfunction
     function! s:dittoUpdate()
         if s:dittoParOn == 1 || s:dittoSentOn == 1 || s:dittoFileOn == 1
             if s:dittoSentOn == 1
-                call s:dittoSentOn()
+                call s:dittoSent()
             elseif s:dittoParOn == 1
-                call s:dittoParOn()
+                call s:dittoPar()
             elseif s:dittoFileOn == 1
-                call s:dittoSentOn()
+                call s:dittoSent()
             else
                 call s:noDitto()
             endif
