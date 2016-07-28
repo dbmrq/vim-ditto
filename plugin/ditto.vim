@@ -54,13 +54,13 @@ endif
 
 " Add good and bad words {{{
 
-let s:ditto_good_words = []
+let g:ditto_good_words = []
 
 function! s:updateGoodWords(...)
-    if len(s:ditto_good_words) > 0 || a:0 > 0
+    if len(g:ditto_good_words) > 0 || a:0 > 0
         new
         setlocal buftype=nofile bufhidden=hide noswapfile nobuflisted
-        for word in s:ditto_good_words
+        for word in g:ditto_good_words
             call append(0, word)
         endfor
         execute 'silent! w! ' . g:dittofile
@@ -68,7 +68,7 @@ function! s:updateGoodWords(...)
         return
     endif
     if filereadable(g:dittofile)
-        let s:ditto_good_words = filter(readfile(g:dittofile), 'v:val != ""')
+        let g:ditto_good_words = filter(readfile(g:dittofile), 'v:val != ""')
     else
         new
         setlocal buftype=nofile bufhidden=hide noswapfile nobuflisted
@@ -93,7 +93,7 @@ function! s:addGoodWord(word)
         let l:dittoOn = 1
     endif
     call s:clearMatches()
-    call add(s:ditto_good_words, a:word)
+    call add(g:ditto_good_words, a:word)
     call s:updateGoodWords()
     " echo 'Ditto: "' . a:word . '"' . ' added to ' . g:dittofile
     if l:dittoOn == 1
@@ -107,9 +107,9 @@ function! s:addBadWord(word)
         let l:dittoOn = 1
     endif
     call s:clearMatches()
-    let index = index(s:ditto_good_words, a:word)
+    let index = index(g:ditto_good_words, a:word)
     if index >= 0
-        call remove(s:ditto_good_words, index)
+        call remove(g:ditto_good_words, index)
     endif
     call s:updateGoodWords(1)
     " echo 'Ditto: "' . a:word . '"' . ' removed from ' . g:dittofile
@@ -150,7 +150,7 @@ function! s:getWords(first_line, last_line)
     let countedWords = {}
     for word in allWords
         if len(word) >= g:ditto_min_word_length &&
-            \ !(join(s:ditto_good_words) =~ word)
+            \ !(join(g:ditto_good_words) =~ word)
                 let countedWords[word] = get(countedWords, word, 0) + 1
         endif
     endfor
@@ -315,21 +315,27 @@ endfunction
         let s:dittoSentOn = 1
         call s:clearMatches()
         call s:dittoSent()
-        au TextChanged,TextChangedI * call s:autoDittoSent()
+        au TextChanged,TextChangedI,WinEnter * call s:autoDittoSent()
+        au BufLeave,WinLeave,TabLeave * call s:clearMatches()
+        au BufEnter,WinEnter,TabEnter * call s:dittoUpdate()
     endfunction
 
     function! s:dittoParOn()
         let s:dittoParOn = 1
         call s:clearMatches()
         call s:dittoPar()
-        au TextChanged,TextChangedI * call s:autoDittoPar()
+        au TextChanged,TextChangedI,WinEnter * call s:autoDittoPar()
+        au BufLeave,WinLeave,TabLeave * call s:clearMatches()
+        au BufEnter,WinEnter,TabEnter * call s:dittoUpdate()
     endfunction
 
     function! s:dittoFileOn()
         let s:dittoFileOn = 1
         call s:clearMatches()
         call s:dittoFile()
-        au TextChanged,TextChangedI * call s:autoDittoFile()
+        au TextChanged,TextChangedI,WinEnter * call s:autoDittoFile()
+        au BufLeave,WinLeave,TabLeave * call s:clearMatches()
+        au BufEnter,WinEnter,TabEnter * call s:dittoUpdate()
     endfunction
 
     function! s:dittoOn()
@@ -363,6 +369,20 @@ endfunction
             call s:dittoOff()
         else
             call s:dittoOn()
+        endif
+    endfunction
+
+    function! s:dittoUpdate()
+        if s:dittoParOn == 1 || s:dittoSentOn == 1 || s:dittoFileOn == 1
+            if s:dittoSentOn == 1
+                call s:dittoSentOn()
+            elseif s:dittoParOn == 1
+                call s:dittoParOn()
+            elseif s:dittoFileOn == 1
+                call s:dittoSentOn()
+            else
+                call s:noDitto()
+            endif
         endif
     endfunction
 
