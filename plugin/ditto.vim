@@ -149,7 +149,7 @@ function! s:getWords(first_line, last_line)
                         \ wordSeparators)
     let countedWords = {}
     for word in allWords
-        if len(word) >= g:ditto_min_word_length &&
+        if len(substitute(word, '.', 'x', 'g')) >= g:ditto_min_word_length &&
             \ !(join(g:ditto_good_words) =~ word)
                 let countedWords[word] = get(countedWords, word, 0) + 1
         endif
