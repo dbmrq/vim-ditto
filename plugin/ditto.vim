@@ -80,11 +80,17 @@ nnoremap <Plug>DittoGood
 nnoremap <Plug>DittoBad
             \ :call ditto#addBadWord(expand("<cword>"))<cr>
 
+nnoremap <silent> <Plug>DittoMore
+            \ :call ditto#dittoMore()<cr>
+
+nnoremap <silent> <Plug>DittoLess
+            \ :call ditto#dittoLess()<cr>
+
 nnoremap <silent> <Plug>DittoNext
-            \ :call ditto#dittoNext()<cr>
+            \ :call ditto#dittoSearch("/")<cr>
 
 nnoremap <silent> <Plug>DittoPrev
-            \ :call ditto#dittoPrev()<cr>
+            \ :call ditto#dittoSearch("?")<cr>
 
 nnoremap <silent> <Plug>DittoOn
             \ :call ditto#dittoOn()<cr>

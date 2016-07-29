@@ -108,6 +108,7 @@ endfunction
 " Highlight words {{{
 
 let s:matchedids = []
+let s:matchedwords = []
 let s:lastrange = ""
 
 function! ditto#ditto(...) range
@@ -126,6 +127,7 @@ function! ditto#ditto(...) range
         let word = words[i][0]
         call add(s:matchedids, matchadd(g:ditto_hlgroups[0], '\c' . word .
             \ '\%>' . (a:firstline - 1) . 'l\%<' . (a:lastline + 1) . 'l'))
+        call add (s:matchedwords, word . '%>' . (a:firstline - 1) . 'l%<' . (a:lastline + 1) . 'l')
     else
         let i = 0
         while i < len(words) && i < len(g:ditto_hlgroups)
@@ -133,6 +135,7 @@ function! ditto#ditto(...) range
             call add(s:matchedids, matchadd(g:ditto_hlgroups[i],
                         \ '\c' . word . '\%>' . (a:firstline - 1) .
                         \ 'l\%<' . (a:lastline + 1) . 'l'))
+        call add (s:matchedwords, word . '%>' . (a:firstline - 1) . 'l%<' . (a:lastline + 1) . 'l')
             let i += 1
         endwhile
     endif
@@ -153,13 +156,34 @@ function! ditto#clearMatches()
         silent! call matchdelete(id)
     endfor
     let s:matchedids = []
+    let s:matchedwords = []
 endfunction
+
+function! ditto#dittoSearch(cmd)
+    let len = len(s:matchedwords)
+    if len == 0
+        return
+    elseif len == 1
+        execute "normal! " . a:cmd . s:matchedwords[0] . "\<cr>"
+        redraw
+    endif
+    let command = "normal! " . a:cmd . "\\v("
+    let i = 0
+    while i < len - 1
+        let command .= s:matchedwords[i] . "|"
+        let i += 1
+    endwhile
+    let command .= s:matchedwords[len - 1] . ")\<cr>"
+    execute command
+    redraw
+endfunction
+
 
     " Show next and previous matches {{{2
 
     let s:matchcount = 0
 
-    function! ditto#dittoNext()
+    function! ditto#dittoMore()
         if s:dittoParOn == 1 || s:dittoSentOn == 1 || s:dittoFileOn == 1
             if len(s:matchedids) != 0
                 let s:matchcount += 1
@@ -172,7 +196,7 @@ endfunction
         endif
     endfunction
 
-    function! ditto#dittoPrev()
+    function! ditto#dittoLess()
         if s:dittoParOn == 1 || s:dittoSentOn == 1 || s:dittoFileOn == 1
             if len(s:matchedids) != 0
                 let s:matchcount -= 1
