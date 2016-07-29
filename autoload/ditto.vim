@@ -1,7 +1,7 @@
 " ditto.vim - Stop repeating yourself
 " Author:   Daniel B. Marques
 " Version:  0.1
-" License:  Same as ViM
+" License:  Same as Vim
 
 if exists("g:autoloaded_ditto") || &cp
   finish

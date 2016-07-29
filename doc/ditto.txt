@@ -1,0 +1,253 @@
+*ditto.txt* Stop repeating yourself
+
+Author: Daniel B. Marques
+License: Same as Vim (see |license|)
+
+This plugin is only available if 'compatible' is not set.
+
+
+
+==============================================================================
+CONTENTS                                                      *ditto-contents*
+
+    1. Introduction .......... |ditto-introduction|
+    2. Commands .............. |ditto-quick-start|
+    3. Mappings .............. |ditto-mappings|
+    4. Options ............... |ditto-options|
+
+
+
+==============================================================================
+INTRODUCTION                                              *ditto-introduction*
+
+Ditto is a Vim plugin that highlights overused words.
+
+
+Quick Start                                                *ditto-quick-start*
+-----------
+
+1. Install Ditto using your favorite plugin manager or copy each file to its
+corresponding directory under ~/.vim/.
+
+2. Add this to your .vimrc:
+
+>
+    au FileType markdown,text,tex DittoOn  " Turn on Ditto's autocmds
+
+    nmap <leader>di <Plug>ToggleDitto      " Turn it on and off
+
+    nmap =d <Plug>DittoNext                " Jump to the next word
+    nmap -d <Plug>DittoPrev                " Jump to the previous word
+    nmap +d <Plug>DittoGood                " Ignore word under cursor
+    nmap _d <Plug>DittoBad                 " Stop ignoring word under cursor
+    nmap ]d <Plug>DittoMore                " Show the next matches
+    nmap [d <Plug>DittoLess                " Show the previous matches
+<
+
+(Chose the filetypes and mappings you prefer. These are only suggestions.)
+
+3. Stop procrastinating and write (God knows I should).
+
+`:DittoOn` starts a set of `autocmd`s that keep the highlighting up to date.
+If you don't like that idea or run into any problems, keep reading for other
+options.
+
+
+
+==============================================================================
+COMMANDS                                                      *ditto-commands*
+
+
+:Ditto                                                                *:Ditto*
+:NoDitto                                                            *:NoDitto*
+--------
+
+`:Ditto` is the command that actually does all the hard work. It highlights
+the most frequent word in the current file or in the current visual selection.
+Most other commands are just wrappers that run `:Ditto` on specific parts of
+your file and keep it up to date.
+
+`:NoDitto`, you guessed it, takes the highlighting away.
+
+
+:DittoSent                                                        *:DittoSent*
+:DittoPar                                                          *:DittoPar*
+:DittoFile                                                        *:DittoFile*
+----------
+
+These three commands run `:Ditto` on each sentence, each paragraph or on
+your whole file, respectively.
+
+
+:DittoOn                                                            *:DittoOn*
+:DittoOff                                                          *:DittoOff*
+---------
+
+If you just go ahead and call one of the commands above, as soon as you make
+some changes in your file you'll notice that the highlighting doesn't keep
+up. That's where `:DittoOn` comes in: besides highlighting the most frequent
+words, it'll add `autocmd`s to keep the highlighting up to date and highlight
+new words as soon as you type them.
+
+By default, `:DittoOn` will update the highlighting every time you insert a
+<space> or add/remove a line from your file. There are a few ways to change
+that, we'll get there soon.
+
+`:DittoOn` will use `:DittoPar` out of the box, so it'll highlight the most
+frequent words in each paragraph as soon as you type them. We'll see how to
+change that too in a minute.
+
+So there at |ditto-quick-start| where it says "au FileType markdown,text,tex
+DittoOn", what it does is run `:DittoOn` on every markdown, text or
+tex files. Whenever you edit one of those files, Ditto will automatically
+highlight overused words in each paragraph.
+
+As for `:DittoOff`, you guessed it again, it removes the highlighting and the
+`autocmd`s (ok, you got me, `:NoDitto` does the exact same thing).
+
+
+:ToggleDitto                                                    *:ToggleDitto*
+------------
+
+Last but not least, `:ToggleDitto` does `:DittoOn` when it's off and
+`:DittoOff` when it's on.
+
+
+
+==============================================================================
+MAPPINGS                                                      *ditto-mappings*
+
+
+<Plug>DittoNext                                              *<Plug>DittoNext*
+<Plug>DittoPrev                                              *<Plug>DittoPrev*
+---------------
+
+Map a couple of keys to these plugs and you will be able to jump to the next
+and previous highlighted words as if they were spelling mistakes or search
+results (ok, you got me again, they're just search results behind the scenes).
+
+
+<Plug>DittoGood                                              *<Plug>DittoGood*
+<Plug>DittoBad                                                *<Plug>DittoBad*
+---------------
+
+If you run Ditton on a big file, soon you will find a few words that you think
+it's ok to repeat (like "suspicious", say it out loud, it just slips through
+your tongue so smoothly).
+
+Use these plugs to ignore or stop ignoring the word under the cursor.
+
+By default, your good words are added to the first readable directory in your
+'runtimepath' plus "/Ditto/dittofile.txt". Sure, you can change that too,
+we'll get to that, be a little patient.
+
+
+<Plug>DittoMore                                              *<Plug>DittoMore*
+<Plug>DittoLess                                              *<Plug>DittoLess*
+---------------
+
+When you run any of the Ditto commands you'll see the words you use the most.
+Use <Plug>DittoMore to show the second word you use the most, and then the
+third, fourth and so on. And then, of course, use <Plug>DittoLess to go back.
+
+When two words are used the same amount of time, Ditto will highlight the
+longest one. If they're the same length it'll just pick one. So it's a good
+idea to use <Plug>DittoMore and <Plug>DittoLess and see what the other
+words are. And yes, you can highlight all the words at the same time, but hang
+on, we're not there yet.
+
+
+<Plug>DittoOn                                                  *<Plug>DittoOn*
+<Plug>DitoOff                                                 *<Plug>DittoOff*
+<Plug>ToggleDitto                                          *<Plug>ToggleDitto*
+-----------------
+
+These are the same as the eponimous commands. They're here again just because,
+well, why not.
+
+
+
+==============================================================================
+OPTIONS                                                        *ditto-options*
+
+
+g:ditto_min_word_length                              *g:ditto_min_word_length*
+-----------------------
+
+Words shorter than this will never be highlighted.
+
+Default: 4
+
+
+g:ditto_min_repetitions                              *g:ditto_min_repetitions*
+-----------------------
+
+Words repeated fewer times than this in each scope won't be highlighted.
+
+Default: 3
+
+
+g:ditto_hlgroups                                            *g:ditto_hlgroups*
+----------------
+
+This is a list of the highlight groups Ditto will use. It'll highlight as many
+different words per scope as there are strings in this list. So if there are 5
+highlight groups in this variable, Ditto will highlight the 5 most used words
+in each sentence, paragraph or file.
+
+Default: ['Error']
+
+
+g:ditto_mode                                                    *g:ditto_mode*
+------------
+
+Use this variable to set the scope used by `:DittoOn`. The current options are:
+>
+    let g:ditto_mode = "sentence"
+    let g:ditto_mode = "paragraph"
+    let g:ditto_mode = "file"
+>
+Default: "paragraph"
+
+
+g:ditto_autocmd                                              *g:ditto_autocmd*
+---------------
+
+This variable controls how often the highlighting is updated. The current
+options are:
+>
+    let g:ditto_autocmd = "InsertCharPre"
+    let g:ditto_autocmd = "CursorHold"
+    let g:ditto_autocmd = "InsertLeave"
+>
+The highlighting is always updated when the number of lines in the file
+changes from normal mode. Besides that, if you set this variable to
+"InsertChartPre" (you don't need to, it's the default), the highlighting
+will be updated every time you insert a <space>. If you set it to
+"CursorHold", the highlighting will be updated every time you spend
+'updatetime' without typing anything (check :h updatetime). If you set this
+to "InsertLeave" the highlighting will only be updated when you leave insert
+mode.
+
+Default: "InsertCharPre"
+
+
+g:ditto_file                                                    *g:ditto_file*
+------------
+
+The name of the file Ditto should use to save its ignored words.
+
+Default: dittofile.txt
+
+
+g:ditto_dir                                                      *g:ditto_dir*
+-----------
+
+The directory where Ditto should save g:ditto_file. It can be a comma
+separated list.
+
+Default: &l:runtimepath . "/Ditto"
+
+
+
+ vim:tw=78:ts=8:ft=help:norl:
