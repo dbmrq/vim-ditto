@@ -32,23 +32,25 @@ if !exists('g:ditto_autocmd')
     let g:ditto_autocmd = 'InsertCharPre'
 endif
 
-if !exists('g:dittofile')
+if !exists('g:ditto_file')
+    let g:ditto_file = 'dittofile.txt'
+endif
+
+if !exists('g:ditto_dir')
     for dir in split(&l:runtimepath, ",")
         if isdirectory(expand(dir))
             if !isdirectory(expand(dir) . '/Ditto')
                 call mkdir(expand(dir) . '/Ditto')
             endif
-            let g:dittofile = expand(dir) . '/Ditto/dittofile.txt'
+            let g:dittofile = expand(dir) . '/Ditto/'. g:ditto_file
             break
         endif
     endfor
 else
     for file in split(g:dittofile, ",")
         if isdirectory(expand(dir))
-            let g:dittofile = expand(dir) . '/dittofile.txt'
+            let g:dittofile = expand(dir) . g:ditto_file
             break
-        else
-            let g:dittofile = expand(dir)
         endif
     endfor
 endif
