@@ -84,7 +84,7 @@ By default, your good words are added to the first readable directory in your `r
 
 When you run any of the Ditto commands you'll see the words you use the most. Use `<Plug>DittoMore` to show the second word you use the most, and then the third, fourth and so on. And then, of course, use`<Plug>DittoLess` to go back.
 
-When two words are used the same amount of time, Ditto will highlight the longest one. If they're the same length it'll just pick one. So it's a good idea to use `<Plug>DittoMore` and `<Plug>DittoLess` and see what the other words are. And yes, you can highlight all the words at the same time, but hang on, we're not there yet.
+When two words are used equally as often, Ditto will highlight the longest one. If they're the same length it'll just pick one. So it's a good idea to use `<Plug>DittoMore` and `<Plug>DittoLess` and see what the other words are. And yes, you can highlight all the words at the same time, but hang on, we're not there yet.
 
 #### `<Plug>DittoOn`, `<Plug>DittoOff` and `<Plug>ToggleDitto`
 
@@ -147,7 +147,7 @@ Default: `dittofile.txt`
 
 The directory where Ditto should save `g:ditto_file`. It can be a comma separated list.
 
-Default: `&l:runtimepath . "/Ditto`
+Default: `&l:runtimepath . "/Ditto"`
 
 
 ## See also
