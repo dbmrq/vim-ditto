@@ -13,7 +13,7 @@ let g:autoloaded_ditto = 1
 
 let g:ditto_good_words = []
 
-function! ditto#getGoodWords()
+function! s:getGoodWords()
     if filereadable(g:dittofile)
         let g:ditto_good_words = filter(readfile(g:dittofile), 'v:val != ""')
     else
@@ -21,13 +21,13 @@ function! ditto#getGoodWords()
     endif
 endfunction
 
-call ditto#getGoodWords()
+call s:getGoodWords()
 
 function! ditto#addGoodWord(word)
-    call ditto#getGoodWords()
-    let l:dittoOn = s:dittoParOn == 1 ||
-        \ s:dittoSentOn == 1 || s:dittoFileOn == 1
-    call ditto#clearMatches()
+    call s:getGoodWords()
+    let l:dittoOn = b:dittoParOn == 1 ||
+        \ b:dittoSentOn == 1 || b:dittoFileOn == 1
+    call s:clearMatches()
     let error = -1
     if index(g:ditto_good_words, a:word) == -1
         call add(g:ditto_good_words, a:word)
@@ -43,10 +43,10 @@ function! ditto#addGoodWord(word)
 endfunction
 
 function! ditto#addBadWord(word)
-    silent call ditto#getGoodWords()
-    let l:dittoOn = s:dittoParOn == 1 ||
-        \ s:dittoSentOn == 1 || s:dittoFileOn == 1
-    call ditto#clearMatches()
+    silent call s:getGoodWords()
+    let l:dittoOn = b:dittoParOn == 1 ||
+        \ b:dittoSentOn == 1 || b:dittoFileOn == 1
+    call s:clearMatches()
     let index = index(g:ditto_good_words, a:word)
     let error = -1
     if index >= 0
@@ -67,7 +67,7 @@ endfunction
 
 " Get most frequent words {{{
 
-function! ditto#wordOrder(first, second)
+function! s:wordOrder(first, second)
     if a:first[1] < a:second[1]
         return 1
     elseif a:first[1] > a:second[1]
@@ -81,13 +81,13 @@ function! ditto#wordOrder(first, second)
     endif
 endfunction
 
-function! ditto#sortWords(dict)
+function! s:sortWords(dict)
     let list = items(a:dict)
-    let sortedDict = sort(list, "ditto#wordOrder")
+    let sortedDict = sort(list, "s:wordOrder")
     return sortedDict
 endfunction
 
-function! ditto#getWords(first_line, last_line)
+function! s:getWords(first_line, last_line)
     let wordSeparators = '[[:blank:][:punct:]]\+'
     let allWords = split(tolower(join(getline(a:first_line, a:last_line))),
                         \ wordSeparators)
@@ -99,7 +99,7 @@ function! ditto#getWords(first_line, last_line)
         endif
     endfor
     call filter(countedWords, 'v:val >= g:ditto_min_repetitions')
-    return ditto#sortWords(countedWords)
+    return s:sortWords(countedWords)
 endfunction
 
 "}}}
@@ -107,17 +107,17 @@ endfunction
 
 " Highlight words {{{
 
-let s:matchedids = []
-let s:matchedwords = []
-let s:lastrange = ""
+let w:matchedids = []
+let b:matchedwords = []
+let b:lastrange = ""
 
 function! ditto#ditto(...) range
     if a:0 > 0
-        let s:lastrange = a:firstline . ',' . a:lastline
+        let b:lastrange = a:firstline . ',' . a:lastline
     endif
     let l:winview = winsaveview()
     execute "normal! m]"
-    let words = ditto#getWords(a:firstline, a:lastline)
+    let words = s:getWords(a:firstline, a:lastline)
     if len(words) <= 0 "
         echo "Ditto: Not enough words"
         return
@@ -125,17 +125,29 @@ function! ditto#ditto(...) range
     if s:matchcount != 0
         let i = abs(s:matchcount % len(words))
         let word = words[i][0]
-        call add(s:matchedids, matchadd(g:ditto_hlgroups[0], '\c' . word .
+        if !exists('w:matchedids')
+            let w:matchedids = []
+        endif
+        if !exists('b:matchedwords')
+            let b:matchedwords = []
+        endif
+        call add(w:matchedids, matchadd(g:ditto_hlgroups[0], '\c' . word .
             \ '\%>' . (a:firstline - 1) . 'l\%<' . (a:lastline + 1) . 'l'))
-        call add (s:matchedwords, word . '%>' . (a:firstline - 1) . 'l%<' . (a:lastline + 1) . 'l')
+        call add (b:matchedwords, word . '%>' . (a:firstline - 1) . 'l%<' . (a:lastline + 1) . 'l')
     else
         let i = 0
         while i < len(words) && i < len(g:ditto_hlgroups)
             let word = words[i][0]
-            call add(s:matchedids, matchadd(g:ditto_hlgroups[i],
+            if !exists('w:matchedids')
+                let w:matchedids = []
+            endif
+            if !exists('b:matchedwords')
+                let b:matchedwords = []
+            endif
+            call add(w:matchedids, matchadd(g:ditto_hlgroups[i],
                         \ '\c' . word . '\%>' . (a:firstline - 1) .
                         \ 'l\%<' . (a:lastline + 1) . 'l'))
-        call add (s:matchedwords, word . '%>' . (a:firstline - 1) . 'l%<' . (a:lastline + 1) . 'l')
+        call add (b:matchedwords, word . '%>' . (a:firstline - 1) . 'l%<' . (a:lastline + 1) . 'l')
             let i += 1
         endwhile
     endif
@@ -144,36 +156,41 @@ function! ditto#ditto(...) range
 endfunction
 
 function! ditto#noDitto()
-    call ditto#clearMatches()
+    call s:clearMatches()
     let s:matchcount = 0
-    let s:dittoSentOn = 0
-    let s:dittoParOn = 0
-    let s:dittoFileOn = 0
+    let b:dittoSentOn = 0
+    let b:dittoParOn = 0
+    let b:dittoFileOn = 0
 endfunction
 
-function! ditto#clearMatches()
-    for id in s:matchedids
-        silent! call matchdelete(id)
-    endfor
-    let s:matchedids = []
-    let s:matchedwords = []
+function! s:clearMatches()
+    if exists('w:matchedids')
+        for id in w:matchedids
+            silent! call matchdelete(id)
+        endfor
+        let w:matchedids = []
+        let b:matchedwords = []
+    endif
 endfunction
 
 function! ditto#dittoSearch(cmd)
-    let len = len(s:matchedwords)
+    if !exists('b:matchedwords')
+        let b:matchedwords = []
+    endif
+    let len = len(b:matchedwords)
     if len == 0
         return
     elseif len == 1
-        execute "normal! " . a:cmd . s:matchedwords[0] . "\<cr>"
+        execute "normal! " . a:cmd . b:matchedwords[0] . "\<cr>"
         redraw
     endif
     let command = "normal! " . a:cmd . "\\v("
     let i = 0
     while i < len - 1
-        let command .= s:matchedwords[i] . "|"
+        let command .= b:matchedwords[i] . "|"
         let i += 1
     endwhile
-    let command .= s:matchedwords[len - 1] . ")\<cr>"
+    let command .= b:matchedwords[len - 1] . ")\<cr>"
     execute command
     redraw
 endfunction
@@ -184,28 +201,28 @@ endfunction
     let s:matchcount = 0
 
     function! ditto#dittoMore()
-        if s:dittoParOn == 1 || s:dittoSentOn == 1 || s:dittoFileOn == 1
-            if len(s:matchedids) != 0
+        if b:dittoParOn == 1 || b:dittoSentOn == 1 || b:dittoFileOn == 1
+            if exists('w:matchedids') && len(w:matchedids) != 0
                 let s:matchcount += 1
             endif
             call ditto#dittoOn()
-        elseif s:lastrange != ""
-            call ditto#clearMatches()
+        elseif b:lastrange != ""
+            call s:clearMatches()
             let s:matchcount += 1
-            execute s:lastrange 'call ditto#ditto()'
+            execute b:lastrange 'call ditto#ditto()'
         endif
     endfunction
 
     function! ditto#dittoLess()
-        if s:dittoParOn == 1 || s:dittoSentOn == 1 || s:dittoFileOn == 1
-            if len(s:matchedids) != 0
+        if b:dittoParOn == 1 || b:dittoSentOn == 1 || b:dittoFileOn == 1
+            if exists('w:matchedids') && len(w:matchedids) != 0
                 let s:matchcount -= 1
             endif
             call ditto#dittoOn()
-        elseif s:lastrange != ""
-            call ditto#clearMatches()
+        elseif b:lastrange != ""
+            call s:clearMatches()
             let s:matchcount -= 1
-            execute s:lastrange 'call ditto#ditto()'
+            execute b:lastrange 'call ditto#ditto()'
         endif
     endfunction
 
@@ -213,7 +230,7 @@ endfunction
 
     " Functions for specific scopes {{{
 
-    function! ditto#dittoSent()
+    function! s:dittoSent()
         let l:winview = winsaveview()
         silent execute "normal! m]"
         silent g/\(\.\|!\|?\)\()\|]\|"\|'\)*\($\|\s\)/execute "normal! v(:call ditto#ditto()\<cr>"
@@ -221,7 +238,7 @@ endfunction
         call winrestview(l:winview)
     endfunction
 
-    function! ditto#dittoPar()
+    function! s:dittoPar()
         let l:winview = winsaveview()
         silent execute "normal! m]"
         silent g/\v.(\n\n|\n*%$)/execute "normal! v{:call ditto#ditto()\<cr>"
@@ -229,7 +246,7 @@ endfunction
         call winrestview(l:winview)
     endfunction
 
-    function! ditto#dittoFile()
+    function! s:dittoFile()
         let l:winview = winsaveview()
         silent execute "normal! m]"
         silent execute line(0) . ',' . line('$') 'call ditto#ditto()'
@@ -237,12 +254,12 @@ endfunction
         call winrestview(l:winview)
     endfunction
 
-    function! ditto#dittoCurrentScope()
+    function! s:dittoCurrentScope()
         let l:winview = winsaveview()
         silent execute "normal! m]"
-        if s:dittoSentOn == 1
+        if b:dittoSentOn == 1
             silent execute "normal! vas:call ditto#ditto()\<cr>"
-        elseif s:dittoFileOn == 1
+        elseif b:dittoFileOn == 1
             silent execute line(0) . ',' . line('$') 'call ditto#ditto()'
         else
             silent execute "normal! vap:call ditto#ditto()\<cr>"
@@ -258,91 +275,116 @@ endfunction
 
 " Functions for autocmds {{{
 
-let s:dittoSentOn = 0
-let s:dittoParOn = 0
-let s:dittoFileOn = 0
+let b:dittoSentOn = 0
+let b:dittoParOn = 0
+let b:dittoFileOn = 0
 
-let s:lastline = 0
+let b:lastline = 0
 
-function! ditto#dittoUpdate()
-    if s:dittoSentOn == 1
-        call ditto#clearMatches()
-        call ditto#dittoSent()
-    elseif s:dittoParOn == 1
-        call ditto#clearMatches()
-        call ditto#dittoPar()
-    elseif s:dittoFileOn == 1
-        call ditto#clearMatches()
-        call ditto#dittoFile()
+function! s:dittoUpdate()
+    if b:dittoSentOn == 1
+        call s:clearMatches()
+        call s:dittoSent()
+    elseif b:dittoParOn == 1
+        call s:clearMatches()
+        call s:dittoPar()
+    elseif b:dittoFileOn == 1
+        call s:clearMatches()
+        call s:dittoFile()
     endif
 endfunction
 
-function! ditto#dittoTextChanged()
-    if line('$') != s:lastline
-        call ditto#dittoUpdate()
-        let s:lastline = line('$')
+function! s:dittoTextChanged()
+    if line('$') != b:lastline
+        call s:dittoUpdate()
+        let b:lastline = line('$')
     endif
 endfunction
 
-function! ditto#dittoInsertCharPre(char)
-    if line('$') != s:lastline &&
+function! s:dittoInsertCharPre(char)
+    if line('$') != b:lastline &&
                 \ len(filter(getline(line('.') + 1, '$'), 'v:val != ""')) > 0
-        call ditto#dittoUpdate()
+        call s:dittoUpdate()
     elseif a:char == " "
-        call ditto#dittoCurrentScope()
+        call s:dittoCurrentScope()
     endif
-        let s:lastline = line('$')
+        let b:lastline = line('$')
 endfunction
 
-function! ditto#dittoCursorHold()
-    if line('$') != s:lastline
-        call ditto#dittoUpdate()
-        let s:lastline = line('$')
+function! s:dittoCursorHold()
+    if line('$') != b:lastline
+        call s:dittoUpdate()
+        let b:lastline = line('$')
     endif
 endfunction
 
 
     " Turn autocmds on and off {{{2
 
-    function! ditto#addAutoCmds()
-        au TextChanged * call ditto#dittoTextChanged()
+    function! s:addAutoCmds()
+        au TextChanged % call s:dittoTextChanged()
         if tolower(g:ditto_autocmd) =~ "cursorhold"
-            au CursorHold * call ditto#dittoCursorHold()
-            au CursorHoldI * call ditto#dittoUpdate()
+            au CursorHold % call s:dittoCursorHold()
+            au CursorHoldI % call s:dittoUpdate()
         elseif tolower(g:ditto_autocmd) =~ "insertleave"
-            au InsertLeave * call ditto#dittoUpdate()
+            au InsertLeave % call s:dittoUpdate()
         else
-            au InsertCharPre * call ditto#dittoInsertCharPre(v:char)
+            au InsertCharPre % call s:dittoInsertCharPre(v:char)
         endif
-        au WinLeave * call ditto#clearMatches()
-        au WinEnter * call ditto#dittoUpdate()
+        " au WinLeave * call s:clearMatches()
+        au WinEnter * call s:dittoUpdate()
     endfunction
 
 
     function! ditto#dittoOn()
-        if s:dittoParOn == 1 || s:dittoSentOn == 1 || s:dittoFileOn == 1
-            call ditto#dittoUpdate()
+        if b:dittoParOn == 1 || b:dittoSentOn == 1 || b:dittoFileOn == 1
+            call s:dittoUpdate()
             return
         endif
         call ditto#noDitto()
         if tolower(g:ditto_mode) =~ 'file'
-            let s:dittoFileOn = 1
+            let b:dittoFileOn = 1
         elseif tolower(g:ditto_mode) =~ 'sent'
-            let s:dittoSentOn = 1
+            let b:dittoSentOn = 1
         else
-            let s:dittoParOn = 1
+            let b:dittoParOn = 1
         endif
-        call ditto#addAutoCmds()
-        call ditto#dittoUpdate()
+        call s:addAutoCmds()
+        call s:dittoUpdate()
     endfunction
 
-    function! ditto#dittoOff()
+    function! ditto#dittoSent()
+        let b:dittoFileOn = 0
+        let b:dittoParOn = 0
+        let b:dittoSentOn = 1
+        call ditto#dittoOn()
+    endfunction
+
+    function! ditto#dittoPar()
+        let b:dittoFileOn = 0
+        let b:dittoParOn = 1
+        let b:dittoSentOn = 0
+        call ditto#dittoOn()
+    endfunction
+
+    function! ditto#dittoFile()
+        let b:dittoFileOn = 1
+        let b:dittoParOn = 0
+        let b:dittoSentOn = 0
+        call ditto#dittoOn()
+    endfunction
+
+    function! s:dittoOff()
         call ditto#noDitto()
     endfunction
 
     function! ditto#toggleDitto()
-        if s:dittoParOn == 1 || s:dittoSentOn == 1 || s:dittoFileOn == 1
-            call ditto#dittoOff()
+        if b:dittoParOn == 1 || b:dittoSentOn == 1 || b:dittoFileOn == 1
+            if exists('w:matchedids') && len(w:matchedids) != 0
+                call s:dittoOff()
+            else
+                call s:dittoUpdate()
+            endif
         else
             call ditto#dittoOn()
         endif
