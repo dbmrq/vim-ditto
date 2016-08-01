@@ -230,7 +230,7 @@ endfunction
 
     " Functions for specific scopes {{{
 
-    function! s:dittoSent()
+    function! ditto#dittoSent()
         let l:winview = winsaveview()
         silent execute "normal! m]"
         silent g/\(\.\|!\|?\)\()\|]\|"\|'\)*\($\|\s\)/execute "normal! v(:call ditto#ditto()\<cr>"
@@ -238,7 +238,7 @@ endfunction
         call winrestview(l:winview)
     endfunction
 
-    function! s:dittoPar()
+    function! ditto#dittoPar()
         let l:winview = winsaveview()
         silent execute "normal! m]"
         silent g/\v.(\n\n|\n*%$)/execute "normal! v{:call ditto#ditto()\<cr>"
@@ -246,7 +246,7 @@ endfunction
         call winrestview(l:winview)
     endfunction
 
-    function! s:dittoFile()
+    function! ditto#dittoFile()
         let l:winview = winsaveview()
         silent execute "normal! m]"
         silent execute line(0) . ',' . line('$') 'call ditto#ditto()'
@@ -284,13 +284,13 @@ let b:lastline = 0
 function! s:dittoUpdate()
     if b:dittoSentOn == 1
         call s:clearMatches()
-        call s:dittoSent()
+        call ditto#dittoSent()
     elseif b:dittoParOn == 1
         call s:clearMatches()
-        call s:dittoPar()
+        call ditto#dittoPar()
     elseif b:dittoFileOn == 1
         call s:clearMatches()
-        call s:dittoFile()
+        call ditto#dittoFile()
     endif
 endfunction
 
@@ -353,21 +353,21 @@ endfunction
         call s:dittoUpdate()
     endfunction
 
-    function! ditto#dittoSent()
+    function! ditto#dittoSentOn()
         let b:dittoFileOn = 0
         let b:dittoParOn = 0
         let b:dittoSentOn = 1
         call ditto#dittoOn()
     endfunction
 
-    function! ditto#dittoPar()
+    function! ditto#dittoParOn()
         let b:dittoFileOn = 0
         let b:dittoParOn = 1
         let b:dittoSentOn = 0
         call ditto#dittoOn()
     endfunction
 
-    function! ditto#dittoFile()
+    function! ditto#dittoFileOn()
         let b:dittoFileOn = 1
         let b:dittoParOn = 0
         let b:dittoSentOn = 0

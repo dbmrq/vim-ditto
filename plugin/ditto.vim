@@ -67,6 +67,10 @@ command! DittoSent call ditto#dittoSent()
 command! DittoPar call ditto#dittoPar()
 command! DittoFile call ditto#dittoFile()
 
+command! DittoSentOn call ditto#dittoSentOn()
+command! DittoParOn call ditto#dittoParOn()
+command! DittoFileOn call ditto#dittoFileOn()
+
 command! DittoOn call ditto#dittoOn()
 command! DittoOff call ditto#noDitto()
 command! ToggleDitto call ditto#toggleDitto()
