@@ -237,6 +237,20 @@ endfunction
         call winrestview(l:winview)
     endfunction
 
+    function! ditto#dittoCurrentScope()
+        let l:winview = winsaveview()
+        silent execute "normal! m]"
+        if s:dittoSentOn == 1
+            silent execute "normal! vas:call ditto#ditto()\<cr>"
+        elseif s:dittoFileOn == 1
+            silent execute line(0) . ',' . line('$') 'call ditto#ditto()'
+        else
+            silent execute "normal! vap:call ditto#ditto()\<cr>"
+        endif
+        silent execute "normal! `]"
+        call winrestview(l:winview)
+    endfunction
+
     "}}}
 
 "}}}
@@ -271,9 +285,13 @@ function! ditto#dittoTextChanged()
 endfunction
 
 function! ditto#dittoInsertCharPre(char)
-    if a:char == " "
+    if line('$') != s:lastline &&
+                \ len(filter(getline(line('.') + 1, '$'), 'v:val != ""')) > 0
         call ditto#dittoUpdate()
+    elseif a:char == " "
+        call ditto#dittoCurrentScope()
     endif
+        let s:lastline = line('$')
 endfunction
 
 function! ditto#dittoCursorHold()
