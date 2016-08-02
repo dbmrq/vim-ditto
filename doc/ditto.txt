@@ -90,12 +90,12 @@ words, it'll add `autocmd`s to keep the highlighting up to date and highlight
 new words as soon as you type them.
 
 By default, `:DittoOn` will update the highlighting every time you insert a
-<space> or add/remove a line from your file. There are a few ways to change
-that, we'll get there soon.
+<space> or add/remove a line from your file. If you don't like that, you can
+also call "ditto#dittoUpdate()" form your own `autocmd`s.
 
-`:DittoOn` will use `:DittoPar` out of the box, so it'll highlight the most
-frequent words in each paragraph as soon as you type them. We'll see how to
-change that too in a minute.
+>
+    au CursorHold,CursorHoldI * call ditto#dittoUpdate()
+<
 
 So there at |ditto-quick-start| where it says "au FileType markdown,text,tex
 DittoOn", what it does is run `:DittoOn` on every markdown, text or
@@ -104,6 +104,17 @@ highlight overused words in each paragraph.
 
 As for `:DittoOff`, you guessed it again, it removes the highlighting and the
 `autocmd`s (ok, you got me, `:NoDitto` does the exact same thing).
+
+
+:DittoSentOn                                                    *:DittoSentOn*
+:DittoParOn                                                      *:DittoParOn*
+:DittoFileOn                                                    *:DittoFileOn*
+------------
+
+`:DittoOn` uses the |g:ditto_mode| variable to decide whether to highlight
+overused words in each sentence, paragraph or file. Whatever you set that
+variable to, you can also use these commands to turn Ditto on in a different
+mode at the current buffer.
 
 
 :ToggleDitto                                                    *:ToggleDitto*
@@ -208,28 +219,6 @@ Use this variable to set the scope used by `:DittoOn`. The current options are:
     let g:ditto_mode = "file"
 >
 Default: "paragraph"
-
-
-g:ditto_autocmd                                              *g:ditto_autocmd*
----------------
-
-This variable controls how often the highlighting is updated. The current
-options are:
->
-    let g:ditto_autocmd = "InsertCharPre"
-    let g:ditto_autocmd = "CursorHold"
-    let g:ditto_autocmd = "InsertLeave"
->
-The highlighting is always updated when the number of lines in the file
-changes from normal mode. Besides that, if you set this variable to
-"InsertChartPre" (you don't need to, it's the default), the highlighting
-will be updated every time you insert a <space>. If you set it to
-"CursorHold", the highlighting will be updated every time you spend
-'updatetime' without typing anything (check :h updatetime). If you set this
-to "InsertLeave" the highlighting will only be updated when you leave insert
-mode.
-
-Default: "InsertCharPre"
 
 
 g:ditto_file                                                    *g:ditto_file*

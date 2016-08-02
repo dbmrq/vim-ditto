@@ -10,16 +10,16 @@ Ditto is a Vim plugin that highlights overused words.
 2. Add this to your `.vimrc`:
 
     ```vim
-    au FileType markdown,text,tex DittoOn " Turn on Ditto's autocmds
-    
-    nmap <leader>di <Plug>ToggleDitto     " Turn it on and off
-    
-    nmap =d <Plug>DittoNext               " Jump to the next word
-    nmap -d <Plug>DittoPrev               " Jump to the previous word
-    nmap +d <Plug>DittoGood               " Ignore the word under the cursor
-    nmap _d <Plug>DittoBad                " Stop ignoring the word under the cursor
-    nmap ]d <Plug>DittoMore               " Show the next matches
-    nmap [d <Plug>DittoLess               " Show the previous matches
+    au FileType markdown,text,tex DittoOn  " Turn on Ditto's autocmds
+
+    nmap <leader>di <Plug>ToggleDitto      " Turn it on and off
+
+    nmap =d <Plug>DittoNext                " Jump to the next word
+    nmap -d <Plug>DittoPrev                " Jump to the previous word
+    nmap +d <Plug>DittoGood                " Ignore the word under the cursor
+    nmap _d <Plug>DittoBad                 " Stop ignoring the word under the cursor
+    nmap ]d <Plug>DittoMore                " Show the next matches
+    nmap [d <Plug>DittoLess                " Show the previous matches
     ```
 
     (Chose the filetypes and mappings you prefer. These are only suggestions.)
@@ -53,17 +53,21 @@ These three commands run `:Ditto` on *each sentence*, *each paragraph* or on you
 
 If you just go ahead and call one of the commands above, as soon as you make some changes in your file you'll notice that the highlighting doesn't keep up. That's where `:DittoOn` comes in: besides highlighting the most frequent words, it'll add `autocmd`s to keep the highlighting up to date and highlight new words as soon as you type them.
 
-By default, `:DittoOn` will update the highlighting every time you insert a `<space>` or add/remove a line from your file. There are a few ways to change that, we'll get there soon.
+By default, `:DittoOn` will update the highlighting every time you insert a `<space>` or add/remove a line from your file. If you don't like that, you can also call `ditto#dittoUpdate()` from your own `autocmd`s:
 
-`:DittoOn` will use `:DittoPar` out of the box, so it'll highlight the most frequent words in each paragraph as soon as you type them. We'll see how to change that too in a minute.
+    au CursorHold,CursorHoldI * call ditto#dittoUpdate()
 
 So there in the example config where it says `au FileType markdown,text,tex DittoOn`, what it does is run `:DittoOn` on every `markdown`, `text` or `tex` files. Whenever you edit one of those files, Ditto will automatically highlight overused words in each paragraph.
 
 As for `:DittoOff`, you guessed it again, it removes the highlighting and the `autocmd`s (ok, you got me, `:NoDitto` does the exact same thing).
 
+#### `:DittoSentOn`, `:DittoParOn` and `:DittoFileOn`
+
+`:DittoOn` uses the [`g:ditto_mode`](#g:ditto_mode) variable to decide whether to highlight overused words in each sentence, paragraph or file. Whatever you set that variable to, you can also use these commands to turn Ditto on in a different mode at the current buffer.
+
 #### `:ToggleDitto`
 
-Last but not least, `:ToggleDitto` does `:DittoOn` when it's off and `:DittoOff` when it's on. :sweat_smile:
+`:ToggleDitto` does `:DittoOn` when Ditto's off and `:DittoOff` when it's on. :sweat_smile:
 
 
 ## Mappings
@@ -122,20 +126,6 @@ let g:ditto_mode = "file"
 ```
 
 Default: `"paragraph"`
-
-#### `g:ditto_autocmd`
-
-This variable controls how often the highlighting is updated. The current options are:
-
-```vim
-let g:ditto_autocmd = "InsertCharPre"
-let g:ditto_autocmd = "CursorHold"
-let g:ditto_autocmd = "InsertLeave"
-```
-
-The highlighting is always updated when the number of lines in the file changes from normal mode. Besides that, if you set this variable to `"InsertChartPre"` (you don't need to, it's the default), the highlighting will be updated every time you insert a `<space>`. If you set it to `"CursorHold"`, the highlighting will be updated every time you spend `updatetime` without typing anything (check `:h updatetime`). If you set this to `"InsertLeave"` the highlighting will only be updated when you leave insert mode.
-
-Default: `"InsertCharPre"`
 
 #### `g:ditto_file`
 
