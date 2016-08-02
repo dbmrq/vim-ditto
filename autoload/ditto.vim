@@ -25,7 +25,6 @@ call s:getGoodWords()
 
 function! ditto#addGoodWord(word)
     let l:winview = winsaveview()
-    execute "normal! m]"
     call s:getGoodWords()
     let l:dittoOn = b:dittoParOn == 1 ||
         \ b:dittoSentOn == 1 || b:dittoFileOn == 1
@@ -38,7 +37,6 @@ function! ditto#addGoodWord(word)
     if l:dittoOn == 1
         call ditto#dittoOn()
     endif
-    execute "normal! `]"
     call winrestview(l:winview)
     if error == 0
         redraw
@@ -48,7 +46,6 @@ endfunction
 
 function! ditto#addBadWord(word)
     let l:winview = winsaveview()
-    execute "normal! m]"
     silent call s:getGoodWords()
     let l:dittoOn = b:dittoParOn == 1 ||
         \ b:dittoSentOn == 1 || b:dittoFileOn == 1
@@ -62,7 +59,6 @@ function! ditto#addBadWord(word)
     if l:dittoOn == 1
         call ditto#dittoOn()
     endif
-    execute "normal! `]"
     call winrestview(l:winview)
     if error == 0
         redraw
@@ -124,7 +120,6 @@ function! ditto#ditto(...) range
         let b:dittoLastRange = a:firstline . ',' . a:lastline
     endif
     let l:winview = winsaveview()
-    execute "normal! m]"
     let words = s:getWords(a:firstline, a:lastline)
     if len(words) <= 0 "
         echo "Ditto: Not enough words"
@@ -166,7 +161,6 @@ function! ditto#ditto(...) range
             let i += 1
         endwhile
     endif
-    execute "normal! `]"
     call winrestview(l:winview)
 endfunction
 
@@ -296,7 +290,6 @@ endfunction
 
     function! ditto#dittoSent() range
     let l:winview = winsaveview()
-    silent execute "normal! m]"
         if a:lastline - a:firstline > 0
             let first_line = a:firstline
             let last_line = a:lastline
@@ -305,15 +298,18 @@ endfunction
             let last_line = line('$')
         endif
         let pattern = '\v[.!?][])"'']*($|\s)'
+        let l:lastSelectionStart = getpos("'<")
+        let l:lastSelectionEnd = getpos("'>")
         silent execute first_line . ',' . last_line . 'g/' .
                 \ pattern . '/execute "normal! v(:call ditto#ditto()\<cr>"'
+        call setpos("'<", l:lastSelectionStart)
+        call setpos("'>", l:lastSelectionEnd)
     silent execute "normal! `]"
     call winrestview(l:winview)
     endfunction
 
     function! ditto#dittoPar() range
     let l:winview = winsaveview()
-    silent execute "normal! m]"
         if a:lastline - a:firstline > 0
             let first_line = a:firstline
             let last_line = a:lastline
@@ -321,27 +317,28 @@ endfunction
             let first_line = 0
             let last_line = line('$')
         endif
+        let l:lastSelectionStart = getpos("'<")
+        let l:lastSelectionEnd = getpos("'>")
         silent execute first_line . ',' . last_line .
             \ 'g/\v.(\n\n|\n*%$)/execute "normal! v{:call ditto#ditto()\<cr>"'
-    silent execute "normal! `]"
+        call setpos("'<", l:lastSelectionStart)
+        call setpos("'>", l:lastSelectionEnd)
     call winrestview(l:winview)
     endfunction
 
     function! ditto#dittoFile()
     let l:winview = winsaveview()
-    silent execute "normal! m]"
         silent execute line(0) . ',' . line('$') 'call ditto#ditto()'
-    silent execute "normal! `]"
     call winrestview(l:winview)
     endfunction
 
     function! s:dittoCurrentScope()
         if b:dittoSentOn == 1
-            silent execute line("'{") . ',' . line("'}") . "call ditto#ditto()"
+            silent execute "'(,')" . "call ditto#dittoSent()"
         elseif b:dittoFileOn == 1
-            silent execute line(0) . ',' . line('$') 'call ditto#ditto()'
+            call ditto#dittoFile()
         else
-            silent execute "'{,'}" . "call ditto#ditto()"
+            silent execute "'{,'}" . "call ditto#dittoPar()"
         endif
     endfunction
 
@@ -359,64 +356,56 @@ let b:dittoFileOn = 0
 let b:dittoLastLine = 0
 
 function! ditto#dittoUpdate() range
-    if exists('b:dittoSentOn') &&
-                \ exists('b:dittoParOn') && exists('b:dittoFileOn')
-        let l:winview = winsaveview()
-        silent execute "normal! m]"
-        if a:lastline - a:firstline > 0
-            let first_line = a:firstline
-            let last_line = a:lastline
-            call s:clearCurrentScope()
-        else
-            let first_line = 0
-            let last_line = line('$')
-            call s:clearMatches()
-        endif
-        if b:dittoSentOn == 1
-            execute first_line . ',' . last_line 'call ditto#dittoSent()'
-        elseif b:dittoParOn == 1
-            execute first_line . ',' . last_line 'call ditto#dittoPar()'
-        elseif b:dittoFileOn == 1
-            call ditto#dittoFile()
-        endif
-        silent execute "normal! `]"
-        call winrestview(l:winview)
+    let l:winview = winsaveview()
+    if a:lastline - a:firstline > 0
+        let first_line = a:firstline
+        let last_line = a:lastline
+        call s:clearMatches(first_line, last_line)
+    else
+        let first_line = 0
+        let last_line = line('$')
+        call s:clearMatches()
     endif
+    if exists('b:dittoFileOn') && b:dittoFileOn == 1
+        call ditto#dittoFile()
+    elseif exists('b:dittoSentOn') && b:dittoSentOn == 1
+        execute first_line . ',' . last_line 'call ditto#dittoSent()'
+    else
+        execute first_line . ',' . last_line 'call ditto#dittoPar()'
+    endif
+    call winrestview(l:winview)
 endfunction
 
 function! s:dittoTextChanged()
     let l:winview = winsaveview()
-    silent execute "normal! m]"
     if line('$') != b:dittoLastLine
-        call ditto#dittoUpdate()
+        execute line("'[") . ',' line('$') . 'call ditto#dittoUpdate()'
         let b:dittoLastLine = line('$')
     else
         call s:clearCurrentScope()
         call s:dittoCurrentScope()
     endif
-    silent execute "normal! `]"
+    let b:dittoLastLine = line('$')
     call winrestview(l:winview)
 endfunction
 
 function! s:dittoTextChangedI()
     let l:winview = winsaveview()
-    silent execute "normal! m]"
     if line('$') != b:dittoLastLine &&
                 \ len(filter(getline(line('.') + 1, '$'), 'v:val != ""')) > 0
-        execute b:dittoLastLine - 1 . ',' .
-                    \ line('$') . 'call ditto#dittoUpdate()'
+        execute line("'[") . ',' line('$') . 'call ditto#dittoUpdate()'
     elseif getline('.')[col('.')-1]  =~ "[ .!?]"
         call s:clearCurrentScope()
         call s:dittoCurrentScope()
     endif
     let b:dittoLastLine = line('$')
-    silent execute "normal! `]"
     call winrestview(l:winview)
 endfunction
 
     " Turn autocmds on and off {{{2
 
     function! s:addAutoCmds()
+        let b:dittoLastLine = line('$')
         au TextChanged <buffer> call s:dittoTextChanged()
         au TextChangedI <buffer> call s:dittoTextChangedI()
         au WinEnter <buffer> call ditto#dittoUpdate()

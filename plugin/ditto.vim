@@ -70,6 +70,7 @@ command! DittoFileOn call ditto#dittoFileOn()
 command! DittoOn call ditto#dittoOn()
 command! DittoOff call ditto#noDitto()
 command! ToggleDitto call ditto#toggleDitto()
+command! DittoUpdate call ditto#dittoUpdate()
 
 "}}}
 
