@@ -1,5 +1,8 @@
 # ditto.vim
+
 Ditto is a Vim plugin that highlights overused words.
+
+You can check the most frequent words in each sentence, paragraph or file, cycle through them, chose which words to ignore and more. 
 
 ![Ditto](https://cloud.githubusercontent.com/assets/15813674/17240247/86ae98dc-5540-11e6-9f20-f0f6ae8a9697.png)
 
