@@ -28,10 +28,6 @@ if !exists('g:ditto_mode')
     let g:ditto_mode = 'paragraph'
 endif
 
-if !exists('g:ditto_autocmd')
-    let g:ditto_autocmd = 'InsertCharPre'
-endif
-
 if !exists('g:ditto_file')
     let g:ditto_file = 'dittofile.txt'
 endif
@@ -106,6 +102,9 @@ nnoremap <silent> <Plug>DittoOff
 
 nnoremap <silent> <Plug>ToggleDitto
             \ :call ditto#toggleDitto()<cr>
+
+nnoremap <silent> <Plug>DittoUpdate
+            \ :call ditto#dittoUpdate()<cr>
 
 "}}}
 
