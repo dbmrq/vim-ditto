@@ -1,6 +1,6 @@
 " ditto.vim - Stop repeating yourself
 " Author:   Daniel B. Marques
-" Version:  0.1
+" Version:  0.2
 " License:  Same as Vim
 
 if exists("g:autoloaded_ditto") || &cp
@@ -180,22 +180,24 @@ endfunction
 
 function! s:clearMatches(...)
     if exists('w:dittoMatchedIDs')
-        if a:0 == 1
-            for id in w:dittoMatchedIDs
-                if id[1] >= a:1
-                    silent! call matchdelete(id[1])
+        if a:0 == 2
+            let i = 0
+            while i < len(w:dittoMatchedIDs)
+                let id = w:dittoMatchedIDs[i]
+                if id[0] >= a:1 && id[1] <= a:2
+                    silent! call matchdelete(id[2])
+                    silent! call remove(w:dittoMatchedIDs, i)
                 endif
-            endfor
-            let w:dittoMatchedIDs = []
-            let b:dittoMatchedwords = []
-        elseif a:0 == 2
-            for id in w:dittoMatchedIDs
-                if id[0] >= a:1 && id[0] <= a:2
-                    silent! call matchdelete(id[1])
+                let i += 1
+            endwhile
+            let i = 0
+            while i < len(b:dittoMatchedwords)
+                let word = b:dittoMatchedwords[i]
+                if word[0] >= a:1 && word[1] <= a:2
+                    silent! call remove(b:dittoMatchedwords, i)
                 endif
-            endfor
-            let w:dittoMatchedIDs = []
-            let b:dittoMatchedwords = []
+                let i += 1
+            endwhile
         else
             for l:match in w:dittoMatchedIDs
                 silent! call matchdelete(l:match[2])
@@ -221,24 +223,7 @@ function! s:clearCurrentScope()
         let first_line = line(parstart)
         let last_line = line(parend)
     endif
-        echo first_line . ' ' . last_line
-    let i = 0
-    while i < len(w:dittoMatchedIDs)
-        let id = w:dittoMatchedIDs[i]
-        if id[0] >= first_line && id[1] <= last_line
-            silent! call matchdelete(id[2])
-            silent! call remove(w:dittoMatchedIDs, i)
-        endif
-        let i += 1
-    endwhile
-    let i = 0
-    while i < len(b:dittoMatchedwords)
-        let word = b:dittoMatchedwords[i]
-        if word[0] >= first_line && word[1] <= last_line
-            silent! call remove(b:dittoMatchedwords, i)
-        endif
-        let i += 1
-    endwhile
+    call s:clearMatches(first_line, last_line)
 endfunction
 
 function! ditto#dittoSearch(cmd)
@@ -352,11 +337,11 @@ endfunction
 
     function! s:dittoCurrentScope()
         if b:dittoSentOn == 1
-            silent execute "normal! v(:call ditto#ditto()\<cr>"
+            silent execute line("'{") . ',' . line("'}") . "call ditto#ditto()"
         elseif b:dittoFileOn == 1
             silent execute line(0) . ',' . line('$') 'call ditto#ditto()'
         else
-            silent execute "normal! v{:call ditto#ditto()\<cr>"
+            silent execute "'{,'}" . "call ditto#ditto()"
         endif
     endfunction
 
@@ -405,6 +390,9 @@ function! s:dittoTextChanged()
     if line('$') != b:dittoLastLine
         call ditto#dittoUpdate()
         let b:dittoLastLine = line('$')
+    else
+        call s:clearCurrentScope()
+        call s:dittoCurrentScope()
     endif
     silent execute "normal! `]"
     call winrestview(l:winview)
@@ -417,7 +405,7 @@ function! s:dittoTextChangedI()
                 \ len(filter(getline(line('.') + 1, '$'), 'v:val != ""')) > 0
         execute b:dittoLastLine - 1 . ',' .
                     \ line('$') . 'call ditto#dittoUpdate()'
-    elseif getline('.')[col('.')-1]  == " "
+    elseif getline('.')[col('.')-1]  =~ "[ .!?]"
         call s:clearCurrentScope()
         call s:dittoCurrentScope()
     endif
