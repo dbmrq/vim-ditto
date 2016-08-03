@@ -67,7 +67,8 @@ command! DittoSentOn call ditto#dittoSentOn()
 command! DittoParOn call ditto#dittoParOn()
 command! DittoFileOn call ditto#dittoFileOn()
 
-command! DittoOn call ditto#dittoOn()
+command! -bang DittoOn if &l:readonly == 0 || <bang>0 == 1 |
+                                            \ call ditto#dittoOn() | endif
 command! DittoOff call ditto#noDitto()
 command! ToggleDitto call ditto#toggleDitto()
 command! DittoUpdate call ditto#dittoUpdate()

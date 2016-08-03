@@ -472,12 +472,14 @@ endfunction
     endfunction
 
     function! ditto#toggleDitto()
-        if b:dittoParOn == 1 || b:dittoSentOn == 1 || b:dittoFileOn == 1
-            if exists('w:dittoMatchedIDs') && len(w:dittoMatchedIDs) != 0
-                call s:dittoOff()
-            else
-                call ditto#dittoUpdate()
-            endif
+        if (exists('b:dittoParOn') &&
+            \ exists('b:dittoSentOn') == 1 && exists('b:dittoFileOn')) &&
+            \ (b:dittoParOn == 1 || b:dittoSentOn == 1 || b:dittoFileOn == 1)
+                if exists('w:dittoMatchedIDs') && len(w:dittoMatchedIDs) != 0
+                    call s:dittoOff()
+                else
+                    call ditto#dittoUpdate()
+                endif
         else
             call ditto#dittoOn()
         endif
