@@ -62,6 +62,8 @@ By default, `:DittoOn` will update the highlighting every time you insert a `<sp
 
 So there in the example config where it says `au FileType markdown,text,tex DittoOn`, what it does is run `:DittoOn` on every `markdown`, `text` or `tex` files. Whenever you edit one of those files, Ditto will automatically highlight overused words in each paragraph.
 
+`:DittoOn` is automatically disabled for readonly files, so you can call it for every text file, like in the example, and Vim's help files won't get all highlighted. If you're editing a readonly file and you still want to turn on Ditto's `autocmd`s, you can use `:DittoOn!`, with the exclamation mark.
+
 As for `:DittoOff`, you guessed it again, it removes the highlighting and the `autocmd`s (ok, you got me, `:NoDitto` does the exact same thing).
 
 #### `:DittoSentOn`, `:DittoParOn` and `:DittoFileOn`
