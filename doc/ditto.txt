@@ -171,11 +171,12 @@ on, we're not there yet.
 
 <Plug>DittoOn                                                  *<Plug>DittoOn*
 <Plug>DitoOff                                                 *<Plug>DittoOff*
+<Plug>DitoUpdate                                           *<Plug>DittoUpdate*
 <Plug>ToggleDitto                                          *<Plug>ToggleDitto*
 -----------------
 
-These are the same as the eponimous commands. They're here again just because,
-well, why not.
+These are the same as the eponimous commands (|ditto-commands|). They're here
+again just because, well, why not.
 
 
 

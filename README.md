@@ -70,7 +70,7 @@ As for `:DittoOff`, you guessed it again, it removes the highlighting and the `a
 
 #### `:ToggleDitto`
 
-`:ToggleDitto` does `:DittoOn` when Ditto's off and `:DittoOff` when it's on. :sweat_smile:
+Last but not least, `:ToggleDitto` does `:DittoOn` when Ditto's off and `:DittoOff` when it's on. :sweat_smile:
 
 
 ## Mappings
@@ -93,7 +93,7 @@ When you run any of the Ditto commands you'll see the words you use the most. Us
 
 When two words are used equally as often, Ditto will highlight the longest one. If they're the same length it'll just pick one. So it's a good idea to use `<Plug>DittoMore` and `<Plug>DittoLess` and see what the other words are. And yes, you can highlight all the words at the same time, but hang on, we're not there yet.
 
-#### `<Plug>DittoOn`, `<Plug>DittoOff` and `<Plug>ToggleDitto`
+#### `<Plug>DittoOn`, `<Plug>DittoOff`, `<Plug>DittoUpdate` and `<Plug>ToggleDitto`
 
 These are the same as the eponimous commands. They're here again just because, well, why not.
 
