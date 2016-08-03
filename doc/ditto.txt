@@ -92,10 +92,10 @@ new words as soon as you type them.
 
 By default, `:DittoOn` will update the highlighting every time you insert a
 <space> or add/remove a line from your file. If you don't like that, you can
-also call `:DittoUpdate` form your own `autocmd`s:
+also run `:DittoUpdate` form your own `autocmd`s:
 
 >
-    au CursorHold,CursorHoldI * call DittoUpdate
+    au CursorHold,CursorHoldI * DittoUpdate
 <
 
 So there at |ditto-quick-start| where it says "au FileType markdown,text,tex

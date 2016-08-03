@@ -56,9 +56,9 @@ These three commands run `:Ditto` on *each sentence*, *each paragraph* or on you
 
 If you just go ahead and call one of the commands above, as soon as you make some changes in your file you'll notice that the highlighting doesn't keep up. That's where `:DittoOn` comes in: besides highlighting the most frequent words, it'll add `autocmd`s to keep the highlighting up to date and highlight new words as soon as you type them.
 
-By default, `:DittoOn` will update the highlighting every time you insert a `<space>` or add/remove a line from your file. If you don't like that, you can also call `:DittoUpdate` from your own `autocmd`s:
+By default, `:DittoOn` will update the highlighting every time you insert a `<space>` or add/remove a line from your file. If you don't like that, you can also run `:DittoUpdate` from your own `autocmd`s:
 
-    au CursorHold,CursorHoldI * call DittoUpdate
+    au CursorHold,CursorHoldI * DittoUpdate
 
 So there in the example config where it says `au FileType markdown,text,tex DittoOn`, what it does is run `:DittoOn` on every `markdown`, `text` or `tex` files. Whenever you edit one of those files, Ditto will automatically highlight overused words in each paragraph.
 
