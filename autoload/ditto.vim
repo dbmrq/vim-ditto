@@ -379,7 +379,11 @@ endfunction
 function! s:dittoTextChanged()
     let l:winview = winsaveview()
     if line('$') != b:dittoLastLine
-        execute line("'[") . ',' line('$') . 'call ditto#dittoUpdate()'
+        let start = line("'[")
+        let end = line('$')
+        if end >= start
+            execute start . ',' end . 'call ditto#dittoUpdate()'
+        endif
         let b:dittoLastLine = line('$')
     else
         call s:clearCurrentScope()
@@ -394,7 +398,7 @@ function! s:dittoTextChangedI()
     if line('$') != b:dittoLastLine &&
                 \ len(filter(getline(line('.') + 1, '$'), 'v:val != ""')) > 0
         execute line("'[") . ',' line('$') . 'call ditto#dittoUpdate()'
-    elseif getline('.')[col('.')-1]  =~ "[ .!?]"
+    elseif getline('.')[col('.')-2]  =~ "[ .!?]"
         call s:clearCurrentScope()
         call s:dittoCurrentScope()
     endif
