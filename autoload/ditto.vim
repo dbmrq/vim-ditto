@@ -377,6 +377,7 @@ function! ditto#dittoUpdate() range
 endfunction
 
 function! s:dittoTextChanged()
+    if !(b:dittoParOn || b:dittoFileOn || b:dittoSentOn) | return | endif
     let l:winview = winsaveview()
     if line('$') != b:dittoLastLine
         let start = line("'[")
@@ -394,6 +395,7 @@ function! s:dittoTextChanged()
 endfunction
 
 function! s:dittoTextChangedI()
+    if !(b:dittoParOn || b:dittoFileOn || b:dittoSentOn) | return | endif
     let l:winview = winsaveview()
     if line('$') != b:dittoLastLine &&
                 \ len(filter(getline(line('.') + 1, '$'), 'v:val != ""')) > 0
