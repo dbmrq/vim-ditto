@@ -380,11 +380,18 @@ function! s:dittoTextChanged()
     if !(b:dittoParOn || b:dittoFileOn || b:dittoSentOn) | return | endif
     let l:winview = winsaveview()
     if line('$') != b:dittoLastLine
-        let start = line("'[")
-        let end = line('$')
-        if end >= start
-            execute start . ',' end . 'call ditto#dittoUpdate()'
-        endif
+        " let start = 0
+        " for id in w:dittoMatchedIDs
+        "     if id[0] > start && id[0] < line("'[")
+        "         let start = id[0]
+        "     endif
+        " endfor
+        " echom start
+        " let end = line('$')
+        " if end >= start
+        "     execute start . ',' end . 'call ditto#dittoUpdate()'
+        " endif
+        call ditto#dittoUpdate()
     else
         call s:clearCurrentScope()
         call s:dittoCurrentScope()
