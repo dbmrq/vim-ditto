@@ -370,7 +370,7 @@ function! ditto#dittoUpdate() range
         call ditto#dittoFile()
     elseif exists('b:dittoSentOn') && b:dittoSentOn == 1
         execute first_line . ',' . last_line 'call ditto#dittoSent()'
-    else
+    elseif exists('b:dittoParOn') && b:dittoParOn == 1
         execute first_line . ',' . last_line 'call ditto#dittoPar()'
     endif
     call winrestview(l:winview)
