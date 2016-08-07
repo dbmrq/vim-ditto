@@ -301,7 +301,7 @@ endfunction
         let l:lastSelectionStart = getpos("'<")
         let l:lastSelectionEnd = getpos("'>")
         silent execute first_line . ',' . last_line . 'g/' .
-                \ pattern . '/execute "normal! v(:call ditto#ditto()\<cr>"'
+                \ pattern . '/execute "normal! V(:call ditto#ditto()\<cr>"'
         call setpos("'<", l:lastSelectionStart)
         call setpos("'>", l:lastSelectionEnd)
     silent execute "normal! `]"
@@ -320,7 +320,7 @@ endfunction
         let l:lastSelectionStart = getpos("'<")
         let l:lastSelectionEnd = getpos("'>")
         silent execute first_line . ',' . last_line .
-            \ 'g/\v.(\n\n|\n*%$)/execute "normal! v{:call ditto#ditto()\<cr>"'
+            \ 'g/\v.(\n\n|\n*%$)/execute "normal! V{:call ditto#ditto()\<cr>"'
         call setpos("'<", l:lastSelectionStart)
         call setpos("'>", l:lastSelectionEnd)
     call winrestview(l:winview)
@@ -385,7 +385,6 @@ function! s:dittoTextChanged()
         if end >= start
             execute start . ',' end . 'call ditto#dittoUpdate()'
         endif
-        let b:dittoLastLine = line('$')
     else
         call s:clearCurrentScope()
         call s:dittoCurrentScope()
