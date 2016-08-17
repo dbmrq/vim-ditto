@@ -17,7 +17,11 @@ function! s:getGoodWords()
     if filereadable(g:dittofile)
         let g:dittoGoodWords = filter(readfile(g:dittofile), 'v:val != ""')
     else
-        writefile([], g:dittofile)
+        if has('nvim')
+            call system('touch ' . g:dittofile)
+        else
+            writefile([], g:dittofile)
+        endif
     endif
 endfunction
 
