@@ -43,12 +43,7 @@ if !exists('g:ditto_dir')
         endif
     endfor
 else
-    for file in split(g:dittofile, ",")
-        if isdirectory(expand(dir))
-            let g:dittofile = expand(dir) . g:ditto_file
-            break
-        endif
-    endfor
+    let g:dittofile = expand(g:ditto_dir) . g:ditto_file
 endif
 
 "}}}
