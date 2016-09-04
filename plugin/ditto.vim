@@ -43,8 +43,12 @@ if !exists('g:ditto_dir')
         endif
     endfor
 else
-    for file in split(g:dittofile, ",")
+    for dir in split(g:ditto_dir, ",")
         if isdirectory(expand(dir))
+            let charlist = split(dir, '\zs')
+            if charlist[len(charlist) - 1] != '/'
+                let dir .= '/'
+            endif
             let g:dittofile = expand(dir) . g:ditto_file
             break
         endif
