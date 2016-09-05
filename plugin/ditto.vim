@@ -28,33 +28,6 @@ if !exists('g:ditto_mode')
     let g:ditto_mode = 'paragraph'
 endif
 
-if !exists('g:ditto_file')
-    let g:ditto_file = 'dittofile.txt'
-endif
-
-if !exists('g:ditto_dir')
-    for dir in split(&l:runtimepath, ",")
-        if isdirectory(expand(dir))
-            if !isdirectory(expand(dir) . '/Ditto')
-                call mkdir(expand(dir) . '/Ditto')
-            endif
-            let g:dittofile = expand(dir) . '/Ditto/'. g:ditto_file
-            break
-        endif
-    endfor
-else
-    for dir in split(g:ditto_dir, ",")
-        if isdirectory(expand(dir))
-            let charlist = split(dir, '\zs')
-            if charlist[len(charlist) - 1] != '/'
-                let dir .= '/'
-            endif
-            let g:dittofile = expand(dir) . g:ditto_file
-            break
-        endif
-    endfor
-endif
-
 "}}}
 
 

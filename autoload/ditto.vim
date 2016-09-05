@@ -9,16 +9,71 @@ endif
 let g:autoloaded_ditto = 1
 
 
+" dittofile {{{
+
+if !exists('g:ditto_file')
+    let g:ditto_file = 'dittofile.txt'
+endif
+
+function! s:getDittoDir()
+    if exists('g:ditto_dir')
+        for dir in split(g:ditto_dir, ",")
+            if isdirectory(expand(dir))
+                let charlist = split(dir, '\zs')
+                if charlist[len(charlist) - 1] != '/'
+                    let dir .= '/'
+                endif
+                return expand(dir)
+            endif
+        endfor
+    endif
+endfunction
+
+function! s:makeDittoDir()
+    for dir in split(&l:runtimepath, ",")
+        if isdirectory(expand(dir))
+            if !isdirectory(expand(dir) . '/Ditto')
+                call mkdir(expand(dir) . '/Ditto')
+            endif
+            return expand(dir) . '/Ditto/'
+        endif
+    endfor
+endfunction
+
+function! s:dittoDir()
+    let dir = s:getDittoDir()
+    if isdirectory(dir)
+        return dir
+    endif
+    let dir = s:makeDittoDir()
+    if isdirectory(dir)
+        return dir
+    endif
+    echoerr "Ditto couldn't get a valid directory to save its good words in."
+endfunction
+
+function! s:dittoFile()
+    let dir = s:dittoDir()
+    let file = dir . g:ditto_file
+    if !filereadable(file)
+        let error = writefile([], file)
+        if error != 0
+            echoerr "Ditto couldn't write to " . file . "."
+            return
+        endif
+    endif
+    return file
+endfunction
+
+let g:dittofile = s:dittoFile()
+
+"}}}
+
+
 " Add and remove good words {{{
 
-let g:dittoGoodWords = []
-
 function! s:getGoodWords()
-    if filereadable(g:dittofile)
-        let g:dittoGoodWords = filter(readfile(g:dittofile), 'v:val != ""')
-    else
-        call writefile([], g:dittofile)
-    endif
+    let g:dittoGoodWords = filter(readfile(g:dittofile), 'v:val != ""')
 endfunction
 
 call s:getGoodWords()
