@@ -49,7 +49,7 @@ function! s:dittoDir()
     if isdirectory(dir)
         return dir
     endif
-    echoerr "Ditto couldn't get a valid directory to save its good words in."
+    echoerr "Ditto couldn't get a valid directory to save its good words in"
 endfunction
 
 function! s:dittoFile()
@@ -58,14 +58,14 @@ function! s:dittoFile()
     if !filereadable(file)
         let error = writefile([], file)
         if error != 0
-            echoerr "Ditto couldn't write to " . file . "."
+            echoerr "Ditto couldn't write to " . file
             return
         endif
     endif
     return file
 endfunction
 
-let g:dittofile = s:dittoFile()
+let s:dittofile = s:dittoFile()
 
 "}}}
 
@@ -73,7 +73,7 @@ let g:dittofile = s:dittoFile()
 " Add and remove good words {{{
 
 function! s:getGoodWords()
-    let g:dittoGoodWords = filter(readfile(g:dittofile), 'v:val != ""')
+    let g:dittoGoodWords = filter(readfile(s:dittofile), 'v:val != ""')
 endfunction
 
 call s:getGoodWords()
@@ -87,7 +87,7 @@ function! ditto#addGoodWord(word)
     let error = -1
     if index(g:dittoGoodWords, a:word) == -1
         call add(g:dittoGoodWords, a:word)
-        let error = writefile(g:dittoGoodWords, g:dittofile)
+        let error = writefile(g:dittoGoodWords, s:dittofile)
     endif
     if l:dittoOn == 1
         call ditto#dittoOn()
@@ -95,7 +95,7 @@ function! ditto#addGoodWord(word)
     call winrestview(l:winview)
     if error == 0
         redraw
-        echo 'Ditto: "' . a:word . '" added to ' . g:dittofile
+        echo 'Ditto: "' . a:word . '" added to ' . s:dittofile
     endif
 endfunction
 
@@ -109,7 +109,7 @@ function! ditto#addBadWord(word)
     let error = -1
     if index >= 0
         call remove(g:dittoGoodWords, index)
-        let error = writefile(g:dittoGoodWords, g:dittofile)
+        let error = writefile(g:dittoGoodWords, s:dittofile)
     endif
     if l:dittoOn == 1
         call ditto#dittoOn()
@@ -117,7 +117,7 @@ function! ditto#addBadWord(word)
     call winrestview(l:winview)
     if error == 0
         redraw
-        echo 'Ditto: "' . a:word . '" removed from ' . g:dittofile
+        echo 'Ditto: "' . a:word . '" removed from ' . s:dittofile
     endif
 endfunction
 
