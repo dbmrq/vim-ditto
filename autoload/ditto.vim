@@ -353,8 +353,8 @@ endfunction
             let last_line = line('$')
         endif
         let pattern = '\v[.!?][])"'']*($|\s)'
-        let l:lastSelectionStart = getpos("'<")
-        let l:lastSelectionEnd = getpos("'>")
+        let l:lastSelectionStart = getpos("`<")
+        let l:lastSelectionEnd = getpos("`>")
         silent execute first_line . ',' . last_line . 'g/' .
                 \ pattern . '/execute "normal! V(:call ditto#ditto()\<cr>"'
         call setpos("'<", l:lastSelectionStart)
@@ -372,8 +372,8 @@ endfunction
             let first_line = 0
             let last_line = line('$')
         endif
-        let l:lastSelectionStart = getpos("'<")
-        let l:lastSelectionEnd = getpos("'>")
+        let l:lastSelectionStart = getpos("`<")
+        let l:lastSelectionEnd = getpos("`>")
         silent execute first_line . ',' . last_line .
             \ 'g/\v.(\n\n|\n*%$)/execute "normal! V{:call ditto#ditto()\<cr>"'
         call setpos("'<", l:lastSelectionStart)
