@@ -147,9 +147,13 @@ Default: `&l:runtimepath . "/Ditto"`
 
 ## See also
 
-Check out [Dialect](https://github.com/danielbmarques/vim-dialect), my other plugin.
+You may also be interested in my other plugins:
 
-You may also be interested in [wordy](https://github.com/reedes/vim-wordy) or [Reedes](https://github.com/reedes)' [many other great plugins](https://github.com/reedes?tab=repositories).
+- [Chalk](https://github.com/dbmrq/vim-chalk): Better fold markers
+- [Dialect](https://github.com/dbmrq/vim-dialect): project specific spellfiles
+
+
+Also check out [wordy](https://github.com/reedes/vim-wordy) and [Reedes](https://github.com/reedes)' [many other great plugins](https://github.com/reedes?tab=repositories).
 
 Also I'm very susceptible to compliments. Just saying.
 
