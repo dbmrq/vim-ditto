@@ -28,7 +28,7 @@ if !exists('g:ditto_mode')
     let g:ditto_mode = 'paragraph'
 endif
 
-"}}}
+" }}}
 
 
 " Commands {{{
@@ -50,7 +50,7 @@ command! DittoOff call ditto#noDitto()
 command! ToggleDitto call ditto#toggleDitto()
 command! DittoUpdate call ditto#dittoUpdate()
 
-"}}}
+" }}}
 
 
 " Plugs {{{
@@ -68,10 +68,10 @@ nnoremap <silent> <Plug>DittoLess
             \ :call ditto#dittoLess()<cr>
 
 nnoremap <silent> <Plug>DittoNext
-            \ :call ditto#dittoSearch("/")<cr>
+            \ :silent keepp call ditto#dittoSearch("/")<cr>
 
 nnoremap <silent> <Plug>DittoPrev
-            \ :call ditto#dittoSearch("?")<cr>
+            \ :silent keepp call ditto#dittoSearch("?")<cr>
 
 nnoremap <silent> <Plug>DittoOn
             \ :call ditto#dittoOn()<cr>
@@ -85,5 +85,5 @@ nnoremap <silent> <Plug>ToggleDitto
 nnoremap <silent> <Plug>DittoUpdate
             \ :call ditto#dittoUpdate()<cr>
 
-"}}}
+" }}}
 
