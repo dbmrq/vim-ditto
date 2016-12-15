@@ -9,7 +9,22 @@ endif
 let g:autoloaded_ditto = 1
 
 
-" dittofile {{{
+" Declarations {{{1
+
+let w:dittoMatchedIDs = []
+let b:dittoMatchedwords = []
+let b:dittoLastRange = ""
+
+let b:dittoSentOn = 0
+let b:dittoParOn = 0
+let b:dittoFileOn = 0
+
+let b:dittoLastLine = 0
+
+" }}}1
+
+
+" dittofile {{{1
 
 if !exists('g:ditto_file')
     let g:ditto_file = 'dittofile.txt'
@@ -67,10 +82,10 @@ endfunction
 
 let s:dittofile = s:dittoFile()
 
-"}}}
+" }}}1
 
 
-" Add and remove good words {{{
+" Add and remove good words {{{1
 
 function! s:getGoodWords()
     let g:dittoGoodWords = filter(readfile(s:dittofile), 'v:val != ""')
@@ -121,10 +136,10 @@ function! ditto#addBadWord(word)
     endif
 endfunction
 
-"}}}
+" }}}1
 
 
-" Get most frequent words {{{
+" Get most frequent words {{{1
 
 function! s:wordOrder(first, second)
     if a:first[1] < a:second[1]
@@ -161,14 +176,10 @@ function! s:getWords(first_line, last_line)
     return s:sortWords(countedWords)
 endfunction
 
-"}}}
+" }}}1
 
 
-" Highlight words {{{
-
-let w:dittoMatchedIDs = []
-let b:dittoMatchedwords = []
-let b:dittoLastRange = ""
+" Highlight words {{{1
 
 function! ditto#ditto(...) range
     if a:0 > 0
@@ -339,9 +350,9 @@ endfunction
         endif
     endfunction
 
-    "}}}2
+    " }}}2
 
-    " Functions for specific scopes {{{
+    " Functions for specific scopes {{{2
 
     function! ditto#dittoSent() range
     let l:winview = winsaveview()
@@ -397,18 +408,12 @@ endfunction
         endif
     endfunction
 
-    "}}}
+    " }}}2
 
-"}}}
+" }}}1
 
 
-" Functions for autocmds {{{
-
-let b:dittoSentOn = 0
-let b:dittoParOn = 0
-let b:dittoFileOn = 0
-
-let b:dittoLastLine = 0
+" Functions for autocmds {{{1
 
 function! ditto#dittoUpdate() range
     let l:winview = winsaveview()
@@ -552,7 +557,7 @@ endfunction
         endif
     endfunction
 
-    "}}}2
+    " }}}2
 
-"}}}
+" }}}1
 
