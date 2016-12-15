@@ -251,6 +251,9 @@ function! s:clearMatches(...)
                 let i += 1
             endwhile
             let i = 0
+            if !exists('b:dittoMatchedwords')
+                let b:dittoMatchedwords = []
+            endif
             while i < len(b:dittoMatchedwords)
                 let word = b:dittoMatchedwords[i]
                 if word[0] >= a:1 && word[1] <= a:2
@@ -437,8 +440,12 @@ function! ditto#dittoUpdate() range
 endfunction
 
 function! s:dittoTextChanged()
+    if !exists('b:dittoParOn') | let b:dittoParOn = 0 | endif
+    if !exists('b:dittoFileOn') | let b:dittoFileOn = 0 | endif
+    if !exists('b:dittoSentOn') | let b:dittoSentOn = 0 | endif
     if !(b:dittoParOn || b:dittoFileOn || b:dittoSentOn) | return | endif
     let l:winview = winsaveview()
+    if !exists('b:dittoLastLine') | let b:dittoLastLine = 0 | endif
     if line('$') != b:dittoLastLine
         " let start = 0
         " for id in w:dittoMatchedIDs
