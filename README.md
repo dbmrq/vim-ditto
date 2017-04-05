@@ -118,7 +118,7 @@ Default: `3`
 
 This is a list of the highlight groups Ditto will use. It'll highlight as many different words per scope as there are strings in this list. So if there are 5 highlight groups in this variable, Ditto will highlight the 5 most used words in each sentence, paragraph or file.
 
-Default: `['Error']`
+Default: `['SpellRare']`
 
 #### `g:ditto_mode`
 
