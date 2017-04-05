@@ -20,7 +20,7 @@ if !exists('g:ditto_min_repetitions')
 endif
 
 if !exists('g:ditto_hlgroups')
-    let g:ditto_hlgroups = ['Error',]
+    let g:ditto_hlgroups = ['SpellRare',]
                         " \ 'Title',]
 endif
 
