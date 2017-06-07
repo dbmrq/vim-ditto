@@ -149,6 +149,7 @@ Default: `&l:runtimepath . "/Ditto"`
 
 You may also be interested in my other plugins:
 
+- [Howdy: a tiny MRU start screen for Vim](https://github.com/dbmrq/vim-howdy) :wave:
 - [Chalk: better fold markers](https://github.com/dbmrq/vim-chalk) :pencil2:
 - [Dialect: project specific spellfiles](https://github.com/dbmrq/vim-dialect) :speech_balloon:
 
