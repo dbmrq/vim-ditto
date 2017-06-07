@@ -64,7 +64,7 @@ So there in the example config where it says `au FileType markdown,text,tex Ditt
 
 `:DittoOn` is automatically disabled for readonly files, so you can call it for every text file, like in the example, and Vim's help files won't get all highlighted. If you're editing a readonly file and you still want to turn on Ditto's `autocmd`s, you can use `:DittoOn!`, with the exclamation mark.
 
-As for `:DittoOff`, you guessed it again, it removes the highlighting and the `autocmd`s (ok, you got me, `:NoDitto` does the exact same thing).
+As for `:DittoOff`, you guessed it again, it removes the highlighting and the `autocmd`s.
 
 #### `:DittoSentOn`, `:DittoParOn` and `:DittoFileOn`
 
@@ -79,15 +79,15 @@ Last but not least, `:ToggleDitto` does `:DittoOn` when Ditto's off and `:DittoO
 
 #### `<Plug>DittoNext` and `<Plug>DittoPrev`
 
-Map a couple of keys to these plugs and you will be able to jump to the next and previous highlighted words as if they were spelling mistakes or search results (ok, you got me again, they're just search results behind the scenes).
+Map a couple of keys to these plugs and you will be able to jump to the next and previous highlighted words as if they were spelling mistakes or search results.
 
 #### `<Plug>DittoGood` and `<Plug>DittoBad`
 
-If you run Ditton on a big file, soon you will find a few words that you think it's ok to repeat (like "suspicious", say it out loud, it just slips through your tongue so smoothly).
+If you run Ditton on a big file, soon you will find a few words that you think it's ok to repeat (like "suspicious", say it out loud, it' such a great word).
 
 Use these plugs to ignore or stop ignoring the word under the cursor.
 
-By default, your good words are added to the first readable directory in your `runtimepath` plus `/Ditto/dittofile.txt`. Sure, you can change that too, we'll get to that, be a little patient.
+By default, your good words are added to the first readable directory in your `runtimepath` plus `/Ditto/dittofile.txt`.
 
 #### `<Plug>DittoMore` and `<Plug>DittoLess`
 
@@ -161,7 +161,7 @@ Also I'm very susceptible to compliments. Just saying.
 
 ----------
 
-And that's it! You'll miss me, I know. But it's for the best.
+And that's it!
 
 Here's a song for you, replace "Lido" with "Ditto" in your head:
 
