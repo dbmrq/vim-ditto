@@ -200,15 +200,13 @@ function! ditto#ditto(...) range
         if !exists('b:dittoMatchedwords')
             let b:dittoMatchedwords = []
         endif
-        " call add(w:dittoMatchedIDs,
-        "             \ matchadd(g:ditto_hlgroups[0], '\c' . word . '\%V'))
-        " call add (b:dittoMatchedwords, word . '\%V'))
         let matches = [a:firstline, a:lastline,
-                    \ matchadd(g:ditto_hlgroups[0], '\c' . word . '\%>' .
+                    \ matchadd(g:ditto_hlgroups[0],
+                    \ '\c' . '\<' . word . '\>' . '\%>' .
                     \ (a:firstline - 1) . 'l\%<' . (a:lastline + 1) . 'l')]
         call add(w:dittoMatchedIDs, matches)
 
-        call add (b:dittoMatchedwords, [a:firstline, a:lastline, word])
+        call add(b:dittoMatchedwords, [a:firstline, a:lastline, word])
     else
         let i = 0
         while i < len(words) && i < len(g:ditto_hlgroups)
@@ -220,10 +218,11 @@ function! ditto#ditto(...) range
                 let b:dittoMatchedwords = []
             endif
             let matches = [a:firstline, a:lastline,
-                    \ matchadd(g:ditto_hlgroups[0], '\c' . word . '\%>' .
-                    \ (a:firstline - 1) . 'l\%<' . (a:lastline + 1) . 'l')]
+                \ matchadd(g:ditto_hlgroups[i],
+                \ '\c' . '\<' . word . '\>' . '\%>' .
+                \ (a:firstline - 1) . 'l\%<' . (a:lastline + 1) . 'l')]
             call add(w:dittoMatchedIDs, matches)
-            call add (b:dittoMatchedwords, [a:firstline, a:lastline, word])
+            call add(b:dittoMatchedwords, [a:firstline, a:lastline, word])
             let i += 1
         endwhile
     endif
@@ -297,24 +296,27 @@ function! ditto#dittoSearch(cmd)
     if len == 0
         return
     elseif len == 1
-        execute "normal! " . a:cmd . s:makeWordPattern(0) . "\<cr>"
+        silent keepp execute "normal! "
+                    \ . a:cmd . '\c' . s:makeWordPattern(0) . "\<cr>"
         redraw
+        return
     endif
-    let command = "normal! " . a:cmd . "\\v("
+    let command = "normal! " . a:cmd . '\c' . '\('
     let i = 0
     while i < len - 1
-        let command .= s:makeWordPattern(i) . "|"
+        let command .= s:makeWordPattern(i) . '\|'
         let i += 1
     endwhile
-    let command .= s:makeWordPattern(len - 1) . ")\<cr>"
+    let command .= s:makeWordPattern(len - 1) . "\\)\<cr>"
     echo b:dittoMatchedwords
-    execute command
+    silent keepp execute command
     redraw
 endfunction
 
 function! s:makeWordPattern(index)
     let word = b:dittoMatchedwords[a:index]
-    return word[2] . '%>' . (word[0] - 1) . 'l%<' . (word[1] + 1) . 'l'
+    return '\%>' . (word[0] - 1) . 'l\%<' . (word[1] + 1) . 'l' .
+                \ '\<' . word[2] . '\>'
 endfunction
 
 
