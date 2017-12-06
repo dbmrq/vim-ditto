@@ -13,9 +13,15 @@ You can check the most frequent words in each sentence, paragraph or file, cycle
 2. Add this to your `.vimrc`:
 
     ```vim
+    " Use autocmds to check your text automatically and keep the highlighting
+    " up to date (easier):
     au FileType markdown,text,tex DittoOn  " Turn on Ditto's autocmds
+    nmap <leader>di <Plug>ToggleDitto      " Turn Ditto on and off
 
-    nmap <leader>di <Plug>ToggleDitto      " Turn it on and off
+    " If you don't want the autocmds, you can also use an operator to check
+    " specific parts of your text:
+    " vmap <leader>d <Plug>Ditto	       " Call Ditto on visual selection
+    " nmap <leader>d <Plug>Ditto	       " Call Ditto on operator movement
 
     nmap =d <Plug>DittoNext                " Jump to the next word
     nmap -d <Plug>DittoPrev                " Jump to the previous word
@@ -28,8 +34,6 @@ You can check the most frequent words in each sentence, paragraph or file, cycle
     (Chose the filetypes and mappings you prefer. These are only suggestions.)
 
 3. Stop procrastinating and write (God knows I should).
-
-`DittoOn` starts a set of `autocmd`s that keep the highlighting up to date. If you don't like that idea or run into any problems, keep reading for other options.
 
 
 ## Table of Contents
@@ -68,7 +72,7 @@ As for `:DittoOff`, you guessed it again, it removes the highlighting and the `a
 
 #### `:DittoSentOn`, `:DittoParOn` and `:DittoFileOn`
 
-`:DittoOn` uses the [`g:ditto_mode`](#g:ditto_mode) variable to decide whether to highlight overused words in each sentence, paragraph or file. Whatever you set that variable to, you can also use these commands to turn Ditto on in a different mode at the current buffer.
+`:DittoOn` uses the [`g:ditto_mode`](#g:ditto_mode) variable to decide whether to highlight overused words in each sentence, paragraph or file. Whatever you set that variable to, you can also use these commands to turn Ditto on in a different mode in the current buffer.
 
 #### `:ToggleDitto`
 
@@ -77,13 +81,17 @@ Last but not least, `:ToggleDitto` does `:DittoOn` when Ditto's off and `:DittoO
 
 ## Mappings
 
+#### `<Plug>Ditto`
+
+Call Ditto for the current selection (in visual mode) or operator movement (in normal mode).
+
 #### `<Plug>DittoNext` and `<Plug>DittoPrev`
 
 Map a couple of keys to these plugs and you will be able to jump to the next and previous highlighted words as if they were spelling mistakes or search results.
 
 #### `<Plug>DittoGood` and `<Plug>DittoBad`
 
-If you run Ditton on a big file, soon you will find a few words that you think it's ok to repeat (like "suspicious", say it out loud, it' such a great word).
+If you run DittoOn on a big file, soon you will find a few words that you think it's ok to repeat.
 
 Use these plugs to ignore or stop ignoring the word under the cursor.
 
@@ -93,11 +101,11 @@ By default, your good words are added to the first readable directory in your `r
 
 When you run any of the Ditto commands you'll see the words you use the most. Use `<Plug>DittoMore` to show the second word you use the most, and then the third, fourth and so on. And then, of course, use`<Plug>DittoLess` to go back.
 
-When two words are used equally as often, Ditto will highlight the longest one. If they're the same length it'll just pick one. So it's a good idea to use `<Plug>DittoMore` and `<Plug>DittoLess` and see what the other words are. And yes, you can highlight all the words at the same time, but hang on, we're not there yet.
+When two words are used equally as often, Ditto will highlight the longest one. If they're the same length it'll just pick one. So it's a good idea to use `<Plug>DittoMore` and `<Plug>DittoLess` and see what the other words are.
 
 #### `<Plug>DittoOn`, `<Plug>DittoOff`, `<Plug>DittoUpdate` and `<Plug>ToggleDitto`
 
-These are the same as the eponimous commands. They're here again just because, well, why not.
+These are the same as the eponimous commands.
 
 
 ## Options
@@ -166,3 +174,4 @@ And that's it!
 Here's a song for you, replace "Lido" with "Ditto" in your head:
 
 [![Ditto Shuffle](http://img.youtube.com/vi/HQZBaJAngH8/0.jpg)](http://www.youtube.com/watch?v=HQZBaJAngH8)
+

@@ -1,6 +1,6 @@
 " ditto.vim - Stop repeating yourself
 " Author:   Daniel B. Marques
-" Version:  0.2
+" Version:  0.3
 " License:  Same as Vim
 
 if exists("g:loaded_ditto") || &cp
@@ -84,6 +84,12 @@ nnoremap <silent> <Plug>ToggleDitto
 
 nnoremap <silent> <Plug>DittoUpdate
             \ :call ditto#dittoUpdate()<cr>
+
+nnoremap <silent> <Plug>Ditto
+            \ :set opfunc=ditto#dittoOp<CR>g@
+
+vnoremap <silent> <Plug>Ditto
+            \ :call ditto#dittoOp(visualmode(), 1)<CR>
 
 " }}}
 

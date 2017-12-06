@@ -30,11 +30,16 @@ Quick Start                                                *ditto-quick-start*
 corresponding directory under ~/.vim/.
 
 2. Add this to your .vimrc:
-
 >
+    " Use autocmds to check your text automatically and keep the highlighting
+    " up to date (easier):
     au FileType markdown,text,tex DittoOn  " Turn on Ditto's autocmds
+    nmap <leader>di <Plug>ToggleDitto      " Turn Ditto on and off
 
-    nmap <leader>di <Plug>ToggleDitto      " Turn it on and off
+    " If you don't want the autocmds, you can also use an operator to check
+    " specific parts of your text:
+    " vmap <leader>d <Plug>Ditto	   " Call Ditto on visual selection
+    " nmap <leader>d <Plug>Ditto	   " Call Ditto on operator movement
 
     nmap =d <Plug>DittoNext                " Jump to the next word
     nmap -d <Plug>DittoPrev                " Jump to the previous word
@@ -43,14 +48,9 @@ corresponding directory under ~/.vim/.
     nmap ]d <Plug>DittoMore                " Show the next matches
     nmap [d <Plug>DittoLess                " Show the previous matches
 <
-
 (Chose the filetypes and mappings you prefer. These are only suggestions.)
 
 3. Stop procrastinating and write (God knows I should).
-
-`:DittoOn` starts a set of `autocmd`s that keep the highlighting up to date.
-If you don't like that idea or run into any problems, keep reading for other
-options.
 
 
 
@@ -121,7 +121,7 @@ As for `:DittoOff`, you guessed it again, it removes the highlighting and the
 `:DittoOn` uses the |g:ditto_mode| variable to decide whether to highlight
 overused words in each sentence, paragraph or file. Whatever you set that
 variable to, you can also use these commands to turn Ditto on in a different
-mode at the current buffer.
+mode in the current buffer.
 
 
 :ToggleDitto                                                    *:ToggleDitto*
@@ -136,28 +136,33 @@ Last but not least, `:ToggleDitto` does `:DittoOn` when it's off and
 MAPPINGS                                                      *ditto-mappings*
 
 
+<Plug>Ditto                                                  *<Plug>DittoNext*
+---------------
+
+Call Ditto for the current selection (in visual mode) or operator movement (in
+normal mode).
+
+
 <Plug>DittoNext                                              *<Plug>DittoNext*
 <Plug>DittoPrev                                              *<Plug>DittoPrev*
 ---------------
 
 Map a couple of keys to these plugs and you will be able to jump to the next
 and previous highlighted words as if they were spelling mistakes or search
-results (ok, you got me again, they're just search results behind the scenes).
+results.
 
 
 <Plug>DittoGood                                              *<Plug>DittoGood*
 <Plug>DittoBad                                                *<Plug>DittoBad*
 ---------------
 
-If you run Ditton on a big file, soon you will find a few words that you think
-it's ok to repeat (like "suspicious", say it out loud, it just slips through
-your tongue so smoothly).
+If you run DittoOn on a big file, soon you will find a few words that you think
+it's ok to repeat.
 
 Use these plugs to ignore or stop ignoring the word under the cursor.
 
 By default, your good words are added to the first readable directory in your
-'runtimepath' plus "/Ditto/dittofile.txt". Sure, you can change that too,
-we'll get to that, be a little patient.
+'runtimepath' plus "/Ditto/dittofile.txt".
 
 
 <Plug>DittoMore                                              *<Plug>DittoMore*
@@ -171,8 +176,7 @@ third, fourth and so on. And then, of course, use <Plug>DittoLess to go back.
 When two words are used the same amount of time, Ditto will highlight the
 longest one. If they're the same length it'll just pick one. So it's a good
 idea to use <Plug>DittoMore and <Plug>DittoLess and see what the other
-words are. And yes, you can highlight all the words at the same time, but hang
-on, we're not there yet.
+words are.
 
 
 <Plug>DittoOn                                                  *<Plug>DittoOn*
@@ -181,8 +185,7 @@ on, we're not there yet.
 <Plug>ToggleDitto                                          *<Plug>ToggleDitto*
 -----------------
 
-These are the same as the eponimous commands (|ditto-commands|). They're here
-again just because, well, why not.
+These are the same as the eponimous commands (|ditto-commands|).
 
 
 
@@ -240,7 +243,7 @@ Default: dittofile.txt
 g:ditto_dir                                                      *g:ditto_dir*
 -----------
 
-The directory where Ditto should save g:ditto_file. It can be a comma
+The directory where Ditto should save |g:ditto_file|. It can be a comma
 separated list.
 
 Default: &l:runtimepath . "/Ditto"

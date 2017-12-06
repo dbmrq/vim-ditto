@@ -1,6 +1,6 @@
 " ditto.vim - Stop repeating yourself
 " Author:   Daniel B. Marques
-" Version:  0.2
+" Version:  0.3
 " License:  Same as Vim
 
 if exists("g:autoloaded_ditto") || &cp
@@ -227,6 +227,21 @@ function! ditto#ditto(...) range
         endwhile
     endif
     call winrestview(l:winview)
+endfunction
+
+function! ditto#dittoOp(type, ...)
+    call ditto#noDitto()
+    if a:0
+        silent execute "normal! '<v'>:call ditto#ditto(1)\<cr>"
+    elseif a:type == 'line'
+        silent execute "normal! `[V`]:call ditto#ditto(1)\<cr>"
+    else
+        silent execute "normal! `[v`]:call ditto#ditto(1)\<cr>"
+    endif
+    augroup DittoOp
+        au TextChanged <buffer> call ditto#noDitto() | au! DittoOp *
+        au TextChangedI <buffer> call ditto#noDitto() | au! DittoOp *
+    augroup END
 endfunction
 
 function! ditto#noDitto()
