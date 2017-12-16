@@ -185,7 +185,7 @@ words are.
 <Plug>ToggleDitto                                          *<Plug>ToggleDitto*
 -----------------
 
-These are the same as the eponimous commands (|ditto-commands|).
+These are the same as the eponymous commands (|ditto-commands|).
 
 
 
