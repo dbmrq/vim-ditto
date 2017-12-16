@@ -105,7 +105,7 @@ When two words are used equally as often, Ditto will highlight the longest one. 
 
 #### `<Plug>DittoOn`, `<Plug>DittoOff`, `<Plug>DittoUpdate` and `<Plug>ToggleDitto`
 
-These are the same as the eponimous commands.
+These are the same as the eponymous commands.
 
 
 ## Options
