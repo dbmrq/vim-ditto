@@ -136,7 +136,7 @@ Last but not least, `:ToggleDitto` does `:DittoOn` when it's off and
 MAPPINGS                                                      *ditto-mappings*
 
 
-<Plug>Ditto                                                  *<Plug>DittoNext*
+<Plug>Ditto                                                      *<Plug>Ditto*
 ---------------
 
 Call Ditto for the current selection (in visual mode) or operator movement (in
