@@ -2,47 +2,83 @@
 
 Ditto is a Vim plugin that highlights overused words.
 
-You can check the most frequent words in each sentence, paragraph or file, cycle through them, choose which words to ignore and more. 
+You can check the most frequent words in each sentence, paragraph or file, cycle through them, choose which words to ignore and more.
 
 ![Ditto](https://cloud.githubusercontent.com/assets/15813674/17240247/86ae98dc-5540-11e6-9f20-f0f6ae8a9697.png)
 
-### Quick start
+## Requirements
 
-1. Install Ditto using your favorite plugin manager or copy each file to its corresponding directory under `~/.vim/`.
+- Vim 8.0 or newer, or Neovim 0.5 or newer.
+- `'compatible'` must be off (the default for most users).
 
-2. Add this to your `.vimrc`:
+See [CHANGELOG.md](CHANGELOG.md) for recent fixes and improvements.
 
-    ```vim
-    " Use autocmds to check your text automatically and keep the highlighting
-    " up to date (easier):
-    au FileType markdown,text,tex DittoOn  " Turn on Ditto's autocmds
-    nmap <leader>di <Plug>ToggleDitto      " Turn Ditto on and off
+## Installation
 
-    " If you don't want the autocmds, you can also use an operator to check
-    " specific parts of your text:
-    " vmap <leader>d <Plug>Ditto	       " Call Ditto on visual selection
-    " nmap <leader>d <Plug>Ditto	       " Call Ditto on operator movement
+Install Ditto with your favorite plugin manager, or clone it into a package directory:
 
-    nmap =d <Plug>DittoNext                " Jump to the next word
-    nmap -d <Plug>DittoPrev                " Jump to the previous word
-    nmap +d <Plug>DittoGood                " Ignore the word under the cursor
-    nmap _d <Plug>DittoBad                 " Stop ignoring the word under the cursor
-    nmap ]d <Plug>DittoMore                " Show the next matches
-    nmap [d <Plug>DittoLess                " Show the previous matches
-    ```
+```sh
+git clone https://github.com/dbmrq/vim-ditto.git \
+  ~/.vim/pack/plugins/start/vim-ditto
+```
 
-    (Chose the filetypes and mappings you prefer. These are only suggestions.)
+With [vim-plug](https://github.com/junegunn/vim-plug):
 
-3. Stop procrastinating and write (God knows I should).
+```vim
+Plug 'dbmrq/vim-ditto'
+```
 
+With [lazy.nvim](https://github.com/folke/lazy.nvim):
+
+```lua
+{
+  'dbmrq/vim-ditto',
+  config = function()
+    vim.api.nvim_create_autocmd('FileType', {
+      pattern = { 'markdown', 'text', 'tex' },
+      command = 'DittoOn',
+    })
+  end,
+}
+```
+
+If you install manually, run `:helptags ~/.vim/pack/plugins/start/vim-ditto/doc` once so `:help ditto` works.
+
+## Quick start
+
+Add this to your `.vimrc` (choose the filetypes and mappings you prefer):
+
+```vim
+augroup ditto
+  autocmd!
+  " Check your text automatically and keep the highlighting up to date.
+  autocmd FileType markdown,text,tex DittoOn
+augroup END
+
+nmap <leader>di <Plug>ToggleDitto      " Turn Ditto on and off
+
+" If you don't want the autocmds, you can also use an operator to check
+" specific parts of your text:
+" vmap <leader>d <Plug>Ditto            " Call Ditto on visual selection
+" nmap <leader>d <Plug>Ditto            " Call Ditto on operator movement
+
+nmap =d <Plug>DittoNext                " Jump to the next word
+nmap -d <Plug>DittoPrev                " Jump to the previous word
+nmap +d <Plug>DittoGood                " Ignore the word under the cursor
+nmap _d <Plug>DittoBad                 " Stop ignoring the word under the cursor
+nmap ]d <Plug>DittoMore                " Show the next matches
+nmap [d <Plug>DittoLess                " Show the previous matches
+```
+
+Then stop procrastinating and write (God knows I should).
 
 ## Table of Contents
 
 - [Commands](#commands)
 - [Mappings](#mappings)
 - [Options](#options)
+- [Development](#development)
 - [See also](#see-also)
-
 
 ## Commands
 
@@ -50,7 +86,7 @@ You can check the most frequent words in each sentence, paragraph or file, cycle
 
 `:Ditto` is the command that actually does all the hard work. It highlights the most frequent word in the current file or in the current visual selection. Most other commands are just wrappers that run `:Ditto` on specific parts of your file and keep it up to date.
 
-`:NoDitto`, you guessed it, takes the highlighting away.
+`:NoDitto` removes the highlighting and the autocmds. It is the same as `:DittoOff`.
 
 #### `:DittoSent`, `:DittoPar` and `:DittoFile`
 
@@ -62,13 +98,15 @@ If you just go ahead and call one of the commands above, as soon as you make som
 
 By default, `:DittoOn` will update the highlighting every time you insert a `<space>` or add/remove a line from your file. If you don't like that, you can also run `:DittoUpdate` from your own `autocmd`s:
 
-    au CursorHold,CursorHoldI * DittoUpdate
+```vim
+autocmd CursorHold,CursorHoldI * DittoUpdate
+```
 
-So there in the example config where it says `au FileType markdown,text,tex DittoOn`, what it does is run `:DittoOn` on every `markdown`, `text` or `tex` files. Whenever you edit one of those files, Ditto will automatically highlight overused words in each paragraph (the default scope can be changed with `g:ditto_mode`).
+So in the example config where it says `autocmd FileType markdown,text,tex DittoOn`, what it does is run `:DittoOn` on every `markdown`, `text` or `tex` file. Whenever you edit one of those files, Ditto will automatically highlight overused words in each paragraph (the default scope can be changed with `g:ditto_mode`).
 
 `:DittoOn` is automatically disabled for readonly files, so you can call it for every text file, like in the example, and Vim's help files won't get all highlighted. If you're editing a readonly file and you still want to turn on Ditto's `autocmd`s, you can use `:DittoOn!`, with the exclamation mark.
 
-As for `:DittoOff`, you guessed it again, it removes the highlighting and the `autocmd`s.
+As for `:DittoOff`, it removes the highlighting and the `autocmd`s.
 
 #### `:DittoSentOn`, `:DittoParOn` and `:DittoFileOn`
 
@@ -77,7 +115,6 @@ As for `:DittoOff`, you guessed it again, it removes the highlighting and the `a
 #### `:ToggleDitto`
 
 Last but not least, `:ToggleDitto` does `:DittoOn` when Ditto's off and `:DittoOff` when it's on. :sweat_smile:
-
 
 ## Mappings
 
@@ -91,22 +128,21 @@ Map a couple of keys to these plugs and you will be able to jump to the next and
 
 #### `<Plug>DittoGood` and `<Plug>DittoBad`
 
-If you run DittoOn on a big file, soon you will find a few words that you think it's ok to repeat.
+If you run `:DittoOn` on a big file, soon you will find a few words that you think it's okay to repeat.
 
 Use these plugs to ignore or stop ignoring the word under the cursor.
 
-By default, your good words are added to the first readable directory in your `runtimepath` plus `/Ditto/dittofile.txt`.
+By default, your good words are added to the first writable directory in your `'runtimepath'` plus `/Ditto/dittofile.txt`. You can change both parts with [`g:ditto_dir`](#g:ditto_dir) and [`g:ditto_file`](#g:ditto_file).
 
 #### `<Plug>DittoMore` and `<Plug>DittoLess`
 
-When you run any of the Ditto commands you'll see the words you use the most. Use `<Plug>DittoMore` to show the second word you use the most, and then the third, fourth and so on. And then, of course, use`<Plug>DittoLess` to go back.
+When you run any of the Ditto commands you'll see the words you use the most. Use `<Plug>DittoMore` to show the second word you use the most, and then the third, fourth and so on. And then, of course, use `<Plug>DittoLess` to go back.
 
 When two words are used equally as often, Ditto will highlight the longest one. If they're the same length it'll just pick one. So it's a good idea to use `<Plug>DittoMore` and `<Plug>DittoLess` and see what the other words are.
 
 #### `<Plug>DittoOn`, `<Plug>DittoOff`, `<Plug>DittoUpdate` and `<Plug>ToggleDitto`
 
 These are the same as the eponymous commands.
-
 
 ## Options
 
@@ -148,10 +184,40 @@ Default: `dittofile.txt`
 
 #### `g:ditto_dir`
 
-The directory where Ditto should save `g:ditto_file`. It can be a comma separated list.
+The directory (or a comma-separated list of directories) where Ditto should save `g:ditto_file`. Ditto uses the first writable directory and creates it if necessary.
 
-Default: `&l:runtimepath . "/Ditto"`
+Default: the first writable directory in `'runtimepath'` plus `/Ditto`
 
+## Development
+
+The unit/integration test suite is self-contained and runs against Vim and Neovim:
+
+```sh
+make test
+```
+
+You can also run it directly:
+
+```sh
+vim -Nu NONE -n -es -S test/run.vim
+nvim --headless -u NONE -n -S test/run.vim
+```
+
+There is also an end-to-end test that opens a real Neovim TUI in tmux, drives a
+small writing scenario, checks the rendered highlight attributes, and captures
+a screenshot after every step:
+
+```sh
+make e2e
+```
+
+It requires `tmux`, `nvim`, Google Chrome, `playwright-cli`, and ImageMagick's
+`montage` for the optional contact sheet. Artifacts are written to
+`test/e2e/out/`, with the full report at `test/e2e/out/report.html` and the
+contact sheet at `test/e2e/out/contact-sheet.png`.
+
+Versioning and release steps are documented in [RELEASING.md](RELEASING.md);
+`make release-check` verifies that the version metadata and changelog agree.
 
 ## See also
 
@@ -162,11 +228,13 @@ You may also be interested in my other plugins:
 - [Chalk: better fold markers](https://github.com/dbmrq/vim-chalk) :pencil2:
 - [Howdy: a tiny MRU start screen for Vim](https://github.com/dbmrq/vim-howdy) :wave:
 
-
 Also check out [wordy](https://github.com/reedes/vim-wordy) and [Reedes](https://github.com/reedes)' [many other great plugins](https://github.com/reedes?tab=repositories).
 
 Also I'm very susceptible to compliments. Just saying.
 
+## License
+
+Same as Vim. See [LICENSE](LICENSE) or `:help license`.
 
 ----------
 
@@ -175,4 +243,3 @@ And that's it!
 Here's a song for you, replace "Lido" with "Ditto" in your head:
 
 [![Ditto Shuffle](http://img.youtube.com/vi/HQZBaJAngH8/0.jpg)](http://www.youtube.com/watch?v=HQZBaJAngH8)
-
