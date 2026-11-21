@@ -1,0 +1,63 @@
+name: test
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        editor:
+          - vim
+          - neovim
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: rhysd/action-setup-vim@v1
+        with:
+          version: stable
+          neovim: ${{ matrix.editor == 'neovim' }}
+
+      - name: Run tests
+        run: |
+          if [ "${{ matrix.editor }}" = "neovim" ]; then
+            nvim --headless -u NONE -n -S test/run.vim
+          else
+            vim -Nu NONE -n -es -S test/run.vim
+          fi
+
+      - name: Check help tags
+        if: matrix.editor == 'vim'
+        run: vim -Nu NONE -n -es -c 'helptags doc' -c 'qa!'
+
+  e2e:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: rhysd/action-setup-vim@v1
+        with:
+          version: stable
+          neovim: true
+
+      - name: Install end-to-end dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y tmux imagemagick
+          npm install -g @playwright/cli
+
+      - name: Run end-to-end test
+        run: make e2e
+
+      - name: Upload screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-screenshots
+          path: test/e2e/out/
+          if-no-files-found: warn

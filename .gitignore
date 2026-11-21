@@ -1,3 +1,9 @@
 *.swp
+*.swo
+*~
 tags
 .DS_Store
+__pycache__/
+*.pyc
+.playwright-cli/
+test/e2e/out/
