@@ -1,95 +1,96 @@
 " ditto.vim - Stop repeating yourself
 " Author:   Daniel B. Marques
-" Version:  0.3
+" Version:  0.4.0
 " License:  Same as Vim
 
-if exists("g:loaded_ditto") || &cp
+if exists('g:loaded_ditto') || &cp
   finish
 endif
 let g:loaded_ditto = 1
 
 
-" Options {{{
+" Options {{{1
 
 if !exists('g:ditto_min_word_length')
-    let g:ditto_min_word_length = 4
+  let g:ditto_min_word_length = 4
 endif
 
 if !exists('g:ditto_min_repetitions')
-    let g:ditto_min_repetitions = 3
+  let g:ditto_min_repetitions = 3
 endif
 
 if !exists('g:ditto_hlgroups')
-    let g:ditto_hlgroups = ['SpellRare',]
-                        " \ 'Title',]
+  let g:ditto_hlgroups = ['SpellRare']
 endif
 
 if !exists('g:ditto_mode')
-    let g:ditto_mode = 'paragraph'
+  let g:ditto_mode = 'paragraph'
 endif
 
-" }}}
+if !exists('g:ditto_file')
+  let g:ditto_file = 'dittofile.txt'
+endif
+
+" }}}1
 
 
-" Commands {{{
+" Commands {{{1
 
-command! -range=% Ditto <line1>,<line2>call ditto#ditto(1)
-command! NoDitto call ditto#noDitto()
+command! -range=% -bar Ditto <line1>,<line2>call ditto#ditto(1)
+command! -bar NoDitto call ditto#noDitto()
 
-command! DittoSent call ditto#dittoSent()
-command! DittoPar call ditto#dittoPar()
-command! DittoFile call ditto#dittoFile()
+command! -bar DittoSent call ditto#dittoSent(1)
+command! -bar DittoPar call ditto#dittoPar(1)
+command! -bar DittoFile call ditto#dittoFile(1)
 
-command! DittoSentOn call ditto#dittoSentOn()
-command! DittoParOn call ditto#dittoParOn()
-command! DittoFileOn call ditto#dittoFileOn()
+command! -bar DittoSentOn call ditto#dittoSentOn()
+command! -bar DittoParOn call ditto#dittoParOn()
+command! -bar DittoFileOn call ditto#dittoFileOn()
 
-command! -bang DittoOn if &l:readonly == 0 || <bang>0 == 1 |
-                                            \ call ditto#dittoOn() | endif
-command! DittoOff call ditto#noDitto()
-command! ToggleDitto call ditto#toggleDitto()
-command! DittoUpdate call ditto#dittoUpdate()
+command! -bang -bar DittoOn call ditto#dittoOn(<bang>0)
+command! -bar DittoOff call ditto#dittoOff()
+command! -bar ToggleDitto call ditto#toggleDitto()
+command! -bar DittoUpdate call ditto#dittoUpdate()
 
-" }}}
+" }}}1
 
 
-" Plugs {{{
+" Plugs {{{1
 
 nnoremap <Plug>DittoGood
-            \ :call ditto#addGoodWord(expand("<cword>"))<cr>
+      \ :<C-U>call ditto#addGoodWord(expand('<cword>'))<cr>
 
 nnoremap <Plug>DittoBad
-            \ :call ditto#addBadWord(expand("<cword>"))<cr>
+      \ :<C-U>call ditto#addBadWord(expand('<cword>'))<cr>
 
 nnoremap <silent> <Plug>DittoMore
-            \ :call ditto#dittoMore()<cr>
+      \ :<C-U>call ditto#dittoMore()<cr>
 
 nnoremap <silent> <Plug>DittoLess
-            \ :call ditto#dittoLess()<cr>
+      \ :<C-U>call ditto#dittoLess()<cr>
 
 nnoremap <silent> <Plug>DittoNext
-            \ :silent keepp call ditto#dittoSearch("/")<cr>
+      \ :<C-U>silent keepp call ditto#dittoSearch('/')<cr>
 
 nnoremap <silent> <Plug>DittoPrev
-            \ :silent keepp call ditto#dittoSearch("?")<cr>
+      \ :<C-U>silent keepp call ditto#dittoSearch('?')<cr>
 
 nnoremap <silent> <Plug>DittoOn
-            \ :call ditto#dittoOn()<cr>
+      \ :<C-U>call ditto#dittoOn()<cr>
 
 nnoremap <silent> <Plug>DittoOff
-            \ :call ditto#dittoOff()<cr>
+      \ :<C-U>call ditto#dittoOff()<cr>
 
 nnoremap <silent> <Plug>ToggleDitto
-            \ :call ditto#toggleDitto()<cr>
+      \ :<C-U>call ditto#toggleDitto()<cr>
 
 nnoremap <silent> <Plug>DittoUpdate
-            \ :call ditto#dittoUpdate()<cr>
+      \ :<C-U>call ditto#dittoUpdate()<cr>
 
 nnoremap <silent> <Plug>Ditto
-            \ :set opfunc=ditto#dittoOp<CR>g@
+      \ :<C-U>set opfunc=ditto#dittoOp<cr>g@
 
 vnoremap <silent> <Plug>Ditto
-            \ :call ditto#dittoOp(visualmode(), 1)<CR>
+      \ :<C-U>call ditto#dittoOp(visualmode(), 1)<cr>
 
-" }}}
-
+" }}}1
